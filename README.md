@@ -17,24 +17,6 @@
 
 </div>
 
----
-
-## 📸 Screenshots
-
-<div align="center">
-
-### 🎯 Offensive Security Dashboard
-<img src=".github/images/screenshots/dashboard.png" alt="ShadowScope Dashboard" width="800"/>
-
-*Real-time attack surface assessment with attack likelihood meter, permission enumeration, and MITRE ATT&CK tactics mapping*
-
-### 🔐 Authentication
-<img src=".github/images/screenshots/login.png" alt="Authentication" width="800"/>
-
-</div>
-
----
-
 ## 🎯 Overview
 
 **ShadowScope** is a comprehensive offensive security assessment tool designed for Red Team operations against Microsoft 365 and Azure environments. It provides a centralized dashboard for enumeration, privilege escalation assessment, lateral movement planning, and data exfiltration capabilities within compromised tenants.
