@@ -1,0 +1,747 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+        overflow: hidden;
+    }
+    .card {
+        background: rgba(18, 20, 29, 0.8);
+        border-radius: 0;
+        overflow: hidden;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    .card::before {
+        display: none;
+    }
+    .card-header {
+        background: rgba(18, 20, 29, 0.9);
+        color: var(--gray-light);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    .card-header i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .card-body {
+        padding: 0.75rem;
+        background: rgba(18, 20, 29, 0.5);
+    }
+    .detail-item {
+        margin-bottom: 0.75rem;
+    }
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+    .detail-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--primary-1);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .detail-value {
+        color: var(--white);
+        font-size: 0.85rem;
+        background: rgba(18, 20, 29, 0.4);
+        padding: 0.35rem 0.5rem;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        line-height: 1.2;
+        box-sizing: border-box;
+        height: auto;
+    }
+    .detail-value code {
+        line-height: 1;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+    .back-btn {
+        color: var(--primary-1);
+        background: transparent;
+        border: none;
+        transition: all 0.2s ease;
+        padding: 0;
+        margin-right: 0.75rem;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+    .back-btn:hover {
+        transform: translateX(-3px);
+        color: var(--white);
+    }
+    .page-title {
+        font-size: 1.1rem;
+        color: var(--white);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    .page-title i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+    }
+    .page-subtitle {
+        color: var(--gray-4);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    code {
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--primary-1);
+        padding: 0.2rem 0.3rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .table-standard {
+        font-size: 0.85rem;
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(18, 20, 29, 0.5);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .table-standard thead {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .table-standard th {
+        padding: 0.75rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--gray-4);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .table-standard td {
+        padding: 0.75rem;
+        color: var(--white);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .table-standard tbody tr:hover {
+        background-color: rgba(255, 113, 91, 0.05);
+    }
+    .section-empty {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gray-4);
+        font-size: 0.9rem;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .header-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 9040 !important;
+    }
+    .modal {
+        z-index: 9050 !important;
+    }
+    .modal-dialog {
+        z-index: 9060 !important;
+        margin: 1.75rem auto;
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    .modal-content {
+        background: rgba(18, 20, 29, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        border-radius: 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 9070 !important;
+        color: var(--white);
+    }
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 113, 91, 0.2);
+        padding: 1rem 1.5rem;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .modal-title {
+        color: var(--white);
+        font-weight: 600;
+    }
+    .modal-body {
+        padding: 1.5rem;
+        color: var(--gray-4);
+    }
+    .modal-body p {
+        color: var(--white);
+        margin-bottom: 1rem;
+    }
+    .modal-body strong {
+        color: var(--primary-1);
+    }
+    .modal-footer {
+        border-top: 1px solid rgba(255, 113, 91, 0.2);
+        padding: 1rem 1.5rem;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .alert-warning {
+        background: rgba(255, 147, 79, 0.15);
+        border: 1px solid rgba(255, 147, 79, 0.3);
+        color: var(--primary-2);
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+    }
+    .alert-warning i {
+        color: var(--primary-2);
+        margin-right: 0.5rem;
+    }
+    .modal.fade .modal-dialog {
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        opacity: 0;
+        transform: translateY(-50%) scale(0.95);
+    }
+    .modal.show .modal-dialog {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box">
+        <div class="p-2">
+            <div class="page-header">
+                <div style="display: flex; align-items: center;">
+                    <a href="{{ url_for('users.list_users') }}" class="back-btn">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <div class="page-title">
+                            <i class="bi bi-person-fill"></i> {{ user.displayName or user.userPrincipalName or 'Unknown User' }}
+                            {% if presence %}
+                            {% set availability = presence.get('availability', '').lower() %}
+                            {% set activity = presence.get('activity', '').lower() %}
+                            {% if availability in ['available', 'focusing', 'presenting'] or activity == 'available' %}
+                            <span class="badge ms-2" style="background: rgba(60, 207, 145, 0.2); color: #3ccf91; font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid #3ccf91;">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: #3ccf91;"></i>Online
+                            </span>
+                            {% elif availability in ['busy', 'donotdisturb', 'inacall', 'inameeting'] or activity in ['busy', 'donotdisturb'] %}
+                            <span class="badge ms-2" style="background: rgba(220, 53, 69, 0.2); color: #dc3545; font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid #dc3545;">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: #dc3545;"></i>Busy
+                            </span>
+                            {% elif availability in ['away', 'berightback'] or activity in ['away', 'berightback', 'outofoffice'] %}
+                            <span class="badge ms-2" style="background: rgba(255, 147, 79, 0.2); color: #ff934f; font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid #ff934f;">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: #ff934f;"></i>Away
+                            </span>
+                            {% elif availability == 'offline' or activity == 'offline' %}
+                            <span class="badge ms-2" style="background: rgba(255, 255, 255, 0.1); color: var(--gray-4); font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid var(--gray-4);">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: var(--gray-4);"></i>Offline
+                            </span>
+                            {% else %}
+                            <span class="badge ms-2" style="background: rgba(255, 255, 255, 0.1); color: var(--gray-4); font-size: 0.65rem; padding: 0.2rem 0.4rem; border: 1px solid var(--gray-4);">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: var(--gray-4);"></i>{{ presence.get('availability', 'Unknown')|title }}
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="page-subtitle">
+                            <code>{{ user.userPrincipalName or user.id }}</code>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button type="button" class="btn btn-sm btn-primary reset-auth py-0 px-2"
+                        style="font-size: 0.75rem; height: 24px;" data-user-id="{{ user.id }}"
+                        data-user-name="{{ user.userPrincipalName or user.displayName or 'Unknown' }}"
+                        data-loading-state="<i class='bi bi-arrow-repeat spin' style='font-size: 0.75rem'></i> Processing..."
+                        data-normal-state="<i class='bi bi-shield-lock' style='font-size: 0.75rem'></i> Reset Auth"
+                        onclick="{% if access.users.base and access.users.features.reset_auth_methods %}showResetAuthModal('{{ user.id }}', '{{ user.userPrincipalName or user.displayName or 'Unknown' }}'){% else %}void(0){% endif %}"
+                        {% if not access.users.base or not access.users.features.reset_auth_methods %}disabled{% endif %}
+                        {% if not access.users.base %}title="Missing base permission to manage users. Required: User.Read.All or User.ReadWrite.All"{% elif not access.users.features.reset_auth_methods %}title="You don't have permission to reset authentication methods. Required permission: UserAuthenticationMethod.ReadWrite.All"{% endif %}>
+                        <i class="bi bi-shield-lock" style="font-size: 0.75rem"></i> Reset Auth
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>User Information</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Display Name</div>
+                        <div class="detail-value">{{ user.displayName or 'N/A' }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">User Principal Name</div>
+                        <div class="detail-value"><code>{{ user.userPrincipalName or 'N/A' }}</code></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">
+                            {% if user.mail %}
+                            <i class="bi bi-envelope me-1" style="color: var(--primary-3); font-size: 0.75rem;"></i>
+                            {{ user.mail }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Job Title</div>
+                        <div class="detail-value">{{ user.jobTitle or 'N/A' }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Department</div>
+                        <div class="detail-value">
+                            {% if user.department %}
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                                {{ user.department }}
+                            </span>
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Office</div>
+                        <div class="detail-value">{{ user.officeLocation or 'N/A' }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Account Status</div>
+                        <div class="detail-value">
+                            {% set account_enabled = user.get('accountEnabled') %}
+                            {% if account_enabled == True or account_enabled == 'true' or account_enabled == 1 %}
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                                Enabled
+                            </span>
+                            {% elif account_enabled == False or account_enabled == 'false' or account_enabled == 0 %}
+                            <span class="badge" style="background: rgba(255, 113, 91, 0.2); color: var(--primary-1);">
+                                Disabled
+                            </span>
+                            {% else %}
+                            <span class="badge" style="background: rgba(255, 113, 91, 0.2); color: var(--primary-1);">
+                                Unknown ({{ account_enabled|default('Not provided') }})
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">User ID</div>
+                        <div class="detail-value"><code style="font-size: 0.75rem;">{{ user.id }}</code></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Presence Status</div>
+                        <div class="detail-value">
+                            {% if presence %}
+                            {% set availability = presence.get('availability', '').lower() %}
+                            {% set activity = presence.get('activity', '').lower() %}
+                            {% set status_message = presence.get('statusMessage', {}) %}
+                            {% if availability in ['available', 'focusing', 'presenting'] or activity == 'available' %}
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: #3ccf91;">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: #3ccf91;"></i>{{ presence.get('availability', 'Unknown')|title }}
+                            </span>
+                            {% elif availability in ['busy', 'donotdisturb', 'inacall', 'inameeting'] or activity in ['busy', 'donotdisturb'] %}
+                            <span class="badge" style="background: rgba(220, 53, 69, 0.2); color: #dc3545;">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: #dc3545;"></i>{{ presence.get('availability', 'Unknown')|title }}
+                            </span>
+                            {% elif availability in ['away', 'berightback'] or activity in ['away', 'berightback', 'outofoffice'] %}
+                            <span class="badge" style="background: rgba(255, 147, 79, 0.2); color: #ff934f;">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: #ff934f;"></i>{{ presence.get('availability', 'Unknown')|title }}
+                            </span>
+                            {% elif availability == 'offline' or activity == 'offline' %}
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: var(--gray-4);">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: var(--gray-4);"></i>Offline
+                            </span>
+                            {% else %}
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: var(--gray-4);">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: var(--gray-4);"></i>{{ presence.get('availability', 'Unknown')|title }}
+                            </span>
+                            {% endif %}
+                            {% if status_message and status_message.get('content') and status_message.get('content')|trim %}
+                            <br><small style="color: var(--gray-4); font-size: 0.7rem; margin-top: 0.25rem; display: block;">{{ status_message.get('content') }}</small>
+                            {% endif %}
+                            {% else %}
+                            <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: var(--gray-4);">
+                                <i class="bi bi-circle-fill" style="font-size: 0.5rem; margin-right: 0.25rem; color: var(--gray-4);"></i>Not Available
+                            </span>
+                            {% if not access.get('presence', {}).get('base', False) %}
+                            <br><small style="color: var(--gray-4); font-size: 0.7rem; margin-top: 0.25rem; display: block;">Missing Presence.Read.All permission</small>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if access.get('roles', {}).get('base', False) %}
+    <div class="card">
+        <div class="card-header">
+            <img src="{{ url_for('static', filename='icons/Entra.svg') }}" alt="Entra ID" style="width: 16px; height: 16px; margin-right: 0.5rem;">
+            <span>Entra ID Directory Roles</span>
+            <span class="badge ms-2" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                {{ roles_data.entra_id_roles|length }}
+            </span>
+        </div>
+        <div class="card-body">
+            {% if roles_data.entra_id_roles %}
+            <div class="table-responsive">
+                <table class="table-standard">
+                    <thead>
+                        <tr>
+                            <th>Role Name</th>
+                            <th>Template ID</th>
+                            <th>Scope</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roles_data.entra_id_roles %}
+                        <tr>
+                            <td>
+                                <i class="bi bi-person-badge me-2" style="color: var(--primary-1);"></i>
+                                <strong>{{ role.role_name }}</strong>
+                                {% if role.assignment_type == 'Inherited' and role.assignment_source %}
+                                <br><small style="color: var(--gray-4); font-size: 0.75rem; margin-left: 1.5rem;">{{ role.assignment_source }}</small>
+                                {% endif %}
+                            </td>
+                            <td><code style="font-size: 0.75rem;">{{ role.role_template_id or 'N/A' }}</code></td>
+                            <td>
+                                <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;" title="{{ role.scope }}">
+                                    {{ role.scope }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge" style="background: {% if role.assignment_type == 'Direct' %}rgba(255, 147, 79, 0.2); color: var(--primary-2);{% else %}rgba(113, 115, 251, 0.2); color: #7173fb;{% endif %}">
+                                    {{ role.assignment_type }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="section-empty">
+                <i class="bi bi-shield-x" style="font-size: 2rem; color: var(--gray-4); margin-bottom: 0.5rem;"></i>
+                <p>No Entra ID directory roles assigned</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if 'rest_token' in session and session.get('rest_token') %}
+    <div class="card">
+        <div class="card-header">
+            <img src="{{ url_for('static', filename='icons/Azure.svg') }}" alt="Azure" style="width: 16px; height: 16px; margin-right: 0.5rem;">
+            <span>Azure RBAC Roles</span>
+            <span class="badge ms-2" style="background: rgba(60, 111, 207, 0.2); color: var(--primary-4);">
+                {{ roles_data.azure_rbac_roles|length }}
+            </span>
+        </div>
+        <div class="card-body">
+            {% if roles_data.azure_rbac_roles %}
+            <div class="table-responsive">
+                <table class="table-standard">
+                    <thead>
+                        <tr>
+                            <th>Role Name</th>
+                            <th>Scope Type</th>
+                            <th>Resource</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roles_data.azure_rbac_roles %}
+                        <tr>
+                            <td>
+                                <i class="bi bi-key-fill me-2" style="color: var(--primary-4);"></i>
+                                <strong>{{ role.role_name }}</strong>
+                                {% if role.role_description %}
+                                <br><small style="color: var(--gray-4); font-size: 0.75rem;">{{ role.role_description[:100] }}{% if role.role_description|length > 100 %}...{% endif %}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge" style="background: rgba(60, 111, 207, 0.2); color: var(--primary-4);">
+                                    {{ role.scope_type }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if role.scope_name %}
+                                <span>
+                                    <i class="bi bi-diagram-3 me-1" style="font-size: 0.7rem;"></i>
+                                    {{ role.scope_name }}
+                                </span>
+                                {% else %}
+                                <code style="font-size: 0.75rem;">{{ role.scope[:50] }}{% if role.scope|length > 50 %}...{% endif %}</code>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge" style="background: rgba(255, 147, 79, 0.2); color: var(--primary-2);">
+                                    {{ role.assignment_type }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="section-empty">
+                <i class="bi bi-cloud-x" style="font-size: 2rem; color: var(--gray-4); margin-bottom: 0.5rem;"></i>
+                <p>No Azure RBAC roles assigned</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if access.get('groups', {}).get('base', False) %}
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-people-fill"></i>
+            <span>Group Memberships</span>
+            <span class="badge ms-2" style="background: rgba(255, 147, 79, 0.2); color: var(--primary-2);">
+                {{ user_groups|length }}
+            </span>
+        </div>
+        <div class="card-body">
+            {% if user_groups %}
+            <div class="table-responsive">
+                <table class="table-standard">
+                    <thead>
+                        <tr>
+                            <th>Group Name</th>
+                            <th>Type</th>
+                            <th>Mail</th>
+                            <th>Membership</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for group in user_groups %}
+                        <tr>
+                            <td>
+                                <i class="bi bi-people me-2" style="color: var(--primary-2);"></i>
+                                <strong>{{ group.displayName }}</strong>
+                            </td>
+                            <td>
+                                {% set group_type = group.groupTypes or [] %}
+                                {% if 'Unified' in group_type %}
+                                <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                                    Microsoft 365
+                                </span>
+                                {% elif group.securityEnabled %}
+                                <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;">
+                                    Security
+                                </span>
+                                {% else %}
+                                <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: var(--gray-4);">
+                                    Distribution
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if group.mail %}
+                                <i class="bi bi-envelope me-1" style="color: var(--primary-3); font-size: 0.75rem;"></i>
+                                {{ group.mail }}
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge" style="background: rgba(255, 147, 79, 0.2); color: var(--primary-2);">
+                                    {{ group.membershipType }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="section-empty">
+                <i class="bi bi-people-x" style="font-size: 2rem; color: var(--gray-4); margin-bottom: 0.5rem;"></i>
+                <p>No group memberships found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="resetAuthModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reset Authentication Methods</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Reset all authentication methods for user: <strong id="resetAuthUserName"></strong></p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    This action will reset all authentication methods for the user. The user will need to re-register
+                    their authentication methods.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmResetAuth"
+                    onclick="confirmResetAuthMethods()">Reset Auth Methods</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentUserId = null;
+
+    function showResetAuthModal(userId, userName) {
+        currentUserId = userId;
+        document.getElementById('resetAuthUserName').textContent = userName;
+        const modal = new bootstrap.Modal(document.getElementById('resetAuthModal'));
+        modal.show();
+        const confirmButton = document.getElementById('confirmResetAuth');
+        confirmButton.disabled = false;
+        confirmButton.innerHTML = 'Reset Auth Methods';
+    }
+
+    async function confirmResetAuthMethods() {
+        const confirmButton = document.getElementById('confirmResetAuth');
+        const originalButtonText = confirmButton.innerHTML;
+        confirmButton.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Processing...';
+        confirmButton.disabled = true;
+
+        const resetButton = document.querySelector(`.reset-auth[data-user-id="${currentUserId}"]`);
+        let resetButtonOriginalText = null;
+
+        if (resetButton) {
+            resetButtonOriginalText = resetButton.innerHTML;
+            resetButton.innerHTML = resetButton.getAttribute('data-loading-state');
+            resetButton.disabled = true;
+        }
+
+        try {
+            const requestUrl = `${window.location.pathname.split('/users')[0]}/users/${currentUserId}/reset_auth_methods`;
+
+            const response = await fetch(requestUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+
+            const modalElement = document.getElementById('resetAuthModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            if (data.success) {
+                showStatus('Authentication methods reset successfully');
+            } else {
+                showStatus(`Error: ${data.message}`, 'error');
+            }
+        } catch (error) {
+            showStatus(`Network error: ${error.message || 'Unknown error'}`, 'error');
+        } finally {
+            confirmButton.innerHTML = originalButtonText;
+            confirmButton.disabled = false;
+
+            if (resetButton && resetButtonOriginalText) {
+                resetButton.innerHTML = resetButtonOriginalText;
+                resetButton.disabled = false;
+            }
+        }
+    }
+</script>
+{% endblock %}

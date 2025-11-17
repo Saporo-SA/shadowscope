@@ -1,0 +1,5 @@
+# Data directory for static reference files
+# This directory contains:
+# - AllAzureRoles.json: All Azure RBAC role definitions
+# - EntraIDRoleDefinitions.json: All Entra ID role definitions
+

@@ -1,0 +1,789 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+        overflow: hidden;
+    }
+    .card {
+        background: rgba(18, 20, 29, 0.8);
+        border-radius: 0;
+        overflow: hidden;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    .card-header {
+        background: rgba(18, 20, 29, 0.9);
+        color: var(--gray-light);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    .card-header i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .card-body {
+        padding: 0.75rem;
+        background: rgba(18, 20, 29, 0.5);
+    }
+    .detail-item {
+        margin-bottom: 0.75rem;
+    }
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+    .detail-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--primary-1);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .detail-value {
+        color: var(--white);
+        font-size: 0.85rem;
+        background: rgba(18, 20, 29, 0.4);
+        padding: 0.35rem 0.5rem;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        line-height: 1.2;
+        box-sizing: border-box;
+        height: auto;
+    }
+    .detail-value code {
+        line-height: 1;
+    }
+    .child-card {
+        border: 1px solid;
+        border-image: linear-gradient(45deg, rgba(255, 113, 91, 0.3), rgba(75, 49, 179, 0.3)) 1;
+        border-radius: 0;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background-color: rgba(18, 20, 29, 0.4);
+        transition: all 0.2s ease;
+    }
+    .child-card:last-child {
+        margin-bottom: 0;
+    }
+    .child-card:hover {
+        background-color: rgba(255, 113, 91, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .child-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--white);
+        font-size: 0.85rem;
+    }
+    .child-title i {
+        color: var(--primary-1);
+        font-size: 0.8rem;
+    }
+    .child-info {
+        margin-top: 0;
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        grid-gap: 0.25rem;
+        align-items: center;
+    }
+    .child-info-label {
+        color: var(--gray-4);
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    .child-info-value {
+        color: var(--white);
+        font-size: 0.7rem;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    .back-btn {
+        color: var(--primary-1);
+        background: transparent;
+        border: none;
+        transition: all 0.2s ease;
+        padding: 0;
+        margin-right: 0.75rem;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+    .back-btn:hover {
+        transform: translateX(-3px);
+        color: var(--white);
+    }
+    .page-title {
+        font-size: 1.1rem;
+        color: var(--white);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    .page-title i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+    }
+    .page-subtitle {
+        color: var(--gray-4);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    code {
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--primary-1);
+        padding: 0.2rem 0.3rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .inheritance-info {
+        background: linear-gradient(45deg, rgba(25, 36, 75, 0.3), rgba(25, 36, 75, 0.4));
+        border: 1px solid rgba(60, 92, 207, 0.3);
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        color: var(--white);
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+    .inheritance-info i {
+        color: var(--white);
+        margin-right: 0.5rem;
+    }
+    .children-container {
+        max-height: 500px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+    }
+    .children-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .children-container::-webkit-scrollbar-track {
+        background: rgba(18, 20, 29, 0.3);
+        border-radius: 3px;
+    }
+    .children-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--primary-1), var(--primary-5));
+        border-radius: 3px;
+    }
+    table.data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    table.data-table th {
+        background: rgba(18, 20, 29, 0.7);
+        color: var(--gray-4);
+        font-weight: 500;
+        text-align: left;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    table.data-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--white);
+    }
+    table.data-table tr:hover {
+        background-color: rgba(255, 113, 91, 0.05);
+    }
+    .hierarchy-diagram-container {
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .inheritance-info mt-2 {
+        margin-top: 1rem;
+    }
+    .hierarchy-diagram {
+        background: rgba(15, 20, 35, 0.9);
+        border: 1px solid rgba(40, 45, 75, 0.5);
+        border-radius: 6px;
+        padding: 2rem 1.5rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    .hierarchy-diagram.collapsed {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin: 0;
+        border: none;
+        opacity: 0;
+    }
+    .hierarchy-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    .hierarchy-item:not(:last-child):after {
+        content: '';
+        position: absolute;
+        width: 2px;
+        background: var(--primary-1);
+        top: 100%;
+        bottom: -1.25rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .hierarchy-node {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 1.25rem;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.3px;
+    }
+    .hierarchy-node i {
+        margin-right: 0.5rem;
+    }
+    .hierarchy-node.root-management-group {
+        background: #351c70;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.management-group {
+        background: #512fab;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.subscription {
+        background: #19244b;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.resource-group {
+        background: #622525;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.resource {
+        background: #0a3323;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-label {
+        font-size: 0.7rem;
+        color: var(--white);
+        text-align: center;
+    }
+    .expand-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(45deg, rgba(255, 113, 91, 0.1), rgba(255, 113, 91, 0.2));
+        color: var(--primary-1);
+        border: 1px solid rgba(255, 113, 91, 0.3);
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+    .expand-btn:hover {
+        background: linear-gradient(45deg, rgba(255, 113, 91, 0.2), rgba(255, 113, 91, 0.3));
+        transform: translateY(-1px);
+    }
+    .expand-btn i {
+        margin-right: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .expand-btn i.rotate {
+        transform: rotate(180deg);
+    }
+    .child-table-container {
+        background: rgba(18, 20, 29, 0.4);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .child-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: rgba(18, 20, 29, 0.8);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .child-search {
+        flex: 1;
+        max-width: 400px;
+    }
+    .child-stats {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .badge.rounded-pill {
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+    .no-children {
+        background: rgba(18, 20, 29, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        padding: 1rem;
+        text-align: center;
+    }
+    .no-children i {
+        font-size: 1.5rem;
+        color: var(--white);
+        margin-bottom: 0.5rem;
+    }
+    .no-children-text {
+        color: var(--white);
+        font-size: 0.85rem;
+    }
+    .child-search input {
+        color: var(--white) !important;
+    }
+    .resource-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .resource-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.15rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .resource-badge i {
+        margin-right: 0.25rem;
+        font-size: 0.7rem;
+    }
+    .no-roles-text {
+        color: var(--gray-4);
+        font-size: 0.8rem;
+        font-style: italic;
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box">
+        <div class="p-2">
+            <div class="page-header">
+                <a href="{{ url_for('management_groups.management_groups') }}" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <div class="page-title">
+                        <i class="bi bi-diagram-3-fill"></i> {{ management_group.displayName }}
+                    </div>
+                    <div class="page-subtitle">
+                        <code>{{ management_group.id }}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Overview</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Display Name</div>
+                        <div class="detail-value">{{ management_group.displayName or management_group.name }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Management Group ID</div>
+                        <div class="detail-value"><code>{{ management_group.name }}</code></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Type</div>
+                        <div class="detail-value">
+                            {% if management_group.isRoot %}
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                                Root Management Group
+                            </span>
+                            {% else %}
+                            <span class="badge" style="background: rgba(255, 147, 79, 0.2); color: var(--primary-2);">
+                                Management Group
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="detail-item">
+                        <div class="detail-label">Resource ID</div>
+                        <div class="detail-value"><code>{{ management_group.id }}</code></div>
+                    </div>
+                </div>
+                {% if management_group.parentManagementGroup and management_group.show_parent %}
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <div class="detail-label">Parent Management Group</div>
+                        <div class="detail-value">
+                            <a href="{{ url_for('management_groups.management_group_details', management_group_id=management_group.parentManagementGroup.id) }}" 
+                                style="color: var(--primary-1); text-decoration: none; display: flex; align-items: center;">
+                                <i class="bi bi-diagram-3-fill me-2"></i>
+                                {{ management_group.parentManagementGroup.name }}
+                                <i class="bi bi-box-arrow-in-right ms-2" style="font-size: 0.75rem;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <div class="detail-label">Tenant ID</div>
+                        <div class="detail-value"><code>{{ management_group.tenantId }}</code></div>
+                    </div>
+                </div>
+                {% if management_group.tags %}
+                <div class="col-md-12">
+                    <div class="detail-item">
+                        <div class="detail-label">Tags</div>
+                        <div class="detail-value" style="flex-wrap: wrap; height: auto; min-height: 32px">
+                            {% for key, value in management_group.tags.items() %}
+                            <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;" title="{{ key }}: {{ value }}">
+                                {{ key }}: {{ value }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="mt-4">
+                <div class="d-flex align-items-center mb-2">
+                    <h6 class="mb-0" style="font-size: 0.9rem; color: var(--white);">
+                        <i class="bi bi-diagram-3-fill me-2" style="color: var(--primary-1);"></i> Permission Inheritance
+                    </h6>
+                    <button class="ms-auto" id="expandBtn" onclick="toggleHierarchy()" 
+                            style="width: auto; 
+                                  padding: 0.25rem 0.75rem; 
+                                  background-color: rgba(255, 113, 91, 0.1); 
+                                  border: 1px solid rgba(255, 113, 91, 0.2);
+                                  border-radius: 4px;
+                                  color: var(--primary-1);
+                                  font-size: 0.75rem;
+                                  font-weight: 500;
+                                  display: flex;
+                                  align-items: center;
+                                  transition: all 0.2s ease;">
+                        <i class="bi bi-chevron-down me-1" id="expandIcon" style="transition: transform 0.3s ease;"></i>
+                        <span id="expandText">Expand</span>
+                    </button>
+                </div>
+                <div class="hierarchy-diagram-container" id="diagramContainer" style="max-height: 0;">
+                    <div class="hierarchy-diagram collapsed" id="hierarchyDiagram">
+                        {% if management_group.managementGroupsHierarchy and management_group.managementGroupsHierarchy|length > 0 %}
+                            {% for mg in management_group.managementGroupsHierarchy %}
+                            <div class="hierarchy-item">
+                                <div class="hierarchy-node {% if mg.type == 'RootManagementGroup' %}root-management-group{% else %}management-group{% endif %}">
+                                    <i class="bi bi-diagram-3-fill"></i> {{ mg.name }}
+                                </div>
+                                <div class="hierarchy-label">
+                                    {% if mg.type == 'RootManagementGroup' %}Root {% endif %}Management Group Level Permissions
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="hierarchy-item">
+                                <div class="hierarchy-node root-management-group">
+                                    <i class="bi bi-diagram-3-fill"></i> {{ management_group.displayName or management_group.name }}
+                                </div>
+                                <div class="hierarchy-label">
+                                    {% if management_group.isRoot %}Root {% endif %}Management Group Level Permissions
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="hierarchy-item">
+                            <div class="hierarchy-node subscription">
+                                <i class="bi bi-key-fill"></i> Subscriptions
+                            </div>
+                            <div class="hierarchy-label">Subscription Level Permissions</div>
+                        </div>
+                        <div class="hierarchy-item">
+                            <div class="hierarchy-node resource-group">
+                                <i class="bi bi-folder-fill"></i> Resource Groups
+                            </div>
+                            <div class="hierarchy-label">Resource Group Level Permissions</div>
+                        </div>
+                        <div class="hierarchy-item">
+                            <div class="hierarchy-node resource">
+                                <i class="bi bi-boxes"></i> Resources
+                            </div>
+                            <div class="hierarchy-label">Resource Level Permissions</div>
+                        </div>
+                    </div>
+                    <div class="inheritance-info mt-2" style="font-size: 0.75rem; background: rgba(25, 36, 75, 0.3); border-color: rgba(25, 36, 75, 0.5);">
+                        <i class="bi bi-info-circle"></i> 
+                        {% if management_group.highest_role_level == "root-management-group" %}
+                            In Azure, permissions follow a hierarchical inheritance model. Your service principal has roles at the Root Management Group level that are inherited by all lower levels following this order: 
+                            <strong>Root Management Group → Management Groups → Subscriptions → Resource Groups → Resources</strong>.
+                        {% elif management_group.highest_role_level == "management-group" %}
+                            In Azure, permissions follow a hierarchical inheritance model. Your service principal has roles at this Management Group level that are inherited by all lower levels following this order: 
+                            <strong>Management Groups → Subscriptions → Resource Groups → Resources</strong>.
+                        {% elif management_group.highest_role_level == "parent-management-group" %}
+                            In Azure, permissions follow a hierarchical inheritance model. Your service principal has roles at a parent Management Group level that are inherited by this Management Group and all lower levels following this order: 
+                            <strong>Management Groups → Subscriptions → Resource Groups → Resources</strong>.
+                        {% else %}
+                            Your service principal may have roles assigned at different levels of the hierarchy. In Azure, permissions follow a hierarchical inheritance model: 
+                            <strong>Management Groups → Subscriptions → Resource Groups → Resources</strong>.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-diagram-3-fill"></i>
+            <span>Children</span>
+        </div>
+        <div class="card-body">
+            <div class="inheritance-info">
+                <i class="bi bi-info-circle"></i> Children inherit role assignments from this Management Group. Users with roles at this Management Group level will have the same permissions for all child Management Groups and Subscriptions.
+            </div>
+            {% if management_group.managementGroups or management_group.subscriptions %}
+            <div class="child-table-container">
+                <div class="child-header">
+                    <div class="child-search">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                                <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                            </span>
+                            <input type="text" class="form-control border-0 bg-transparent py-1" id="childSearch" 
+                                placeholder="Search children..." 
+                                oninput="filterChildren()"
+                                style="
+                                    background-color: rgba(18, 20, 29, 0.6) !important;
+                                    color: var(--white);
+                                    border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                    height: 32px;
+                                ">
+                        </div>
+                    </div>
+                    <div class="child-stats">
+                        {% if management_group.managementGroups %}
+                        <div class="badge rounded-pill bg-primary">
+                            <i class="bi bi-diagram-3-fill me-1"></i>
+                            {{ management_group.managementGroups|length }} Management Group{% if management_group.managementGroups|length != 1 %}s{% endif %}
+                        </div>
+                        {% endif %}
+                        {% if management_group.subscriptions %}
+                        <div class="badge rounded-pill bg-success">
+                            <i class="bi bi-key-fill me-1"></i>
+                            {{ management_group.subscriptions|length }} Subscription{% if management_group.subscriptions|length != 1 %}s{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="children-container p-2">
+                    <div class="row" id="childrenList">
+                        {% for child in management_group.managementGroups %}
+                        <div class="col-12 mb-2 child-item" data-type="management-group">
+                            <div class="child-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="child-title">
+                                        <i class="bi bi-diagram-3-fill"></i> {{ child.name }}
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('management_groups.management_group_details', management_group_id=child.id) }}" 
+                                           class="btn btn-sm btn-primary py-0 px-2"
+                                           style="font-size: 0.75rem; height: 24px;">
+                                            <i class="bi bi-eye" style="font-size: 0.75rem"></i> View Details
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="resource-meta mt-2">
+                                    <div class="resource-badge">
+                                        <i class="bi bi-diagram-3-fill"></i> 
+                                        <span>Management Group</span>
+                                    </div>
+                                    <div class="resource-badge">
+                                        <i class="bi bi-fingerprint"></i>
+                                        <code style="font-size: 0.7rem; background: transparent; padding: 0;">{{ child.id }}</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% for child in management_group.subscriptions %}
+                        <div class="col-12 mb-2 child-item" data-type="subscription">
+                            <div class="child-card">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="child-title">
+                                        <i class="bi bi-key-fill"></i> {{ child.name }}
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('subscriptions.subscription_details', subscription_id=child.id) }}" 
+                                           class="btn btn-sm btn-primary py-0 px-2"
+                                           style="font-size: 0.75rem; height: 24px;">
+                                            <i class="bi bi-eye" style="font-size: 0.75rem"></i> View Details
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="resource-meta mt-2">
+                                    <div class="resource-badge">
+                                        <i class="bi bi-key-fill"></i> 
+                                        <span>Subscription</span>
+                                    </div>
+                                    <div class="resource-badge">
+                                        <i class="bi bi-fingerprint"></i>
+                                        <code style="font-size: 0.7rem; background: transparent; padding: 0;">{{ child.id }}</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-children">
+                <i class="bi bi-exclamation-circle"></i>
+                <div class="no-children-text">
+                    No children found in this management group. Management Groups can contain child Management Groups and Subscriptions.
+                </div>
+                <div class="mt-3">
+                    <a href="https://portal.azure.com/#blade/Microsoft_Azure_ManagementGroups/HierarchyBlade/managementGroupId/{{ management_group.name }}" 
+                       class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-cloud me-1"></i> View in Azure Portal
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleHierarchy() {
+        const diagram = document.getElementById('hierarchyDiagram');
+        const container = document.getElementById('diagramContainer');
+        const icon = document.getElementById('expandIcon');
+        const text = document.getElementById('expandText');
+        const btn = document.getElementById('expandBtn');
+        
+        if (diagram.classList.contains('collapsed')) {
+            // Expanding
+            diagram.classList.remove('collapsed');
+            container.style.maxHeight = '550px'; // Fixed height for consistency
+            icon.style.transform = 'rotate(180deg)';
+            text.textContent = 'Collapse';
+            btn.style.backgroundColor = 'rgba(60, 92, 207, 0.1)';
+            btn.style.borderColor = 'rgba(60, 92, 207, 0.2)';
+        } else {
+            // Collapsing
+            diagram.classList.add('collapsed');
+            container.style.maxHeight = '0';
+            icon.style.transform = 'rotate(0deg)';
+            text.textContent = 'Expand';
+            btn.style.backgroundColor = 'rgba(255, 113, 91, 0.1)';
+            btn.style.borderColor = 'rgba(255, 113, 91, 0.2)';
+        }
+    }
+
+    function filterChildren() {
+        let input = document.getElementById('childSearch');
+        let filter = input.value.toUpperCase();
+        let items = document.querySelectorAll('.child-item');
+
+        items.forEach(item => {
+            let childName = item.querySelector('.child-title').textContent;
+            let childType = item.dataset.type;
+            
+            if (childName.toUpperCase().indexOf(filter) > -1 || childType.toUpperCase().indexOf(filter) > -1) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

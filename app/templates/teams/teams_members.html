@@ -1,0 +1,607 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    .row {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    .container, .container-fluid {
+        padding-right: 0 !important;
+        padding-left: 0 !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    body {
+        overflow-x: hidden !important;
+        color: var(--gray-4);
+        background-color: var(--gray-1);
+        background-image: linear-gradient(45deg, rgba(18, 20, 29, 0.95), rgba(18, 20, 29, 0.98));          
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+</style>
+
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); color: white; border-radius: 0 !important;">
+                <h5 class="modal-title" id="statusModalLabel">
+                    <i class="bi bi-info-circle me-2"></i>Notification
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="notificationMessage" class="mb-0 fs-5"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="object-list" style="overflow-x: hidden; max-width: 100%;">
+    <div class="content-box mb-4" style="overflow-x: hidden; max-width: 100%;">
+        <div class="d-flex align-items-center p-2">
+            <a href="{{ url_for('teams.list_teams') }}" class="btn btn-link text-decoration-none me-2">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h5 class="mb-0 d-flex align-items-center">
+                <i class="bi bi-microsoft-teams me-2" style="color: var(--primary-1);"></i>
+                <span style="color: white;">{{ team.displayName }}</span>
+            </h5>
+        </div>
+    </div>
+
+    <div class="row g-4" style="margin-right: 0; margin-left: 0;">
+        <div class="col-md-6">
+            <div class="content-box table-box" style="max-width: 100%; overflow-x: hidden;">
+                <div class="card border-0">
+                    <div class="card-header" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); border-radius: 0 !important;">
+                        <h5 class="card-title mb-0 text-white">
+                            <i class="bi bi-person-check-fill"></i> Current Members
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-transparent" 
+                                       id="currentMembersSearch" placeholder="Search current members...">
+                            </div>
+                        </div>
+                        <div class="table-container" style="overflow-x: hidden;">
+                            <div class="table-responsive" style="overflow-x: hidden;">
+                                <div class="members-list" id="currentMembersList">
+                                    {% for member in members %}
+                                    <div class="list-group-item border-0 border-bottom member-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="fw-semibold text-white">{{ member.get('displayName', 'Name not available') }}</div>
+                                                    {% if member.get('is_owner', False) %}
+                                                    <span class="badge bg-warning text-dark ms-2">Owner</span>
+                                                    {% endif %}
+                                                </div>
+                                                <small style="color: var(--primary-1);">{{ member.get('userPrincipalName', '') }}</small>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-member"
+                                                data-member-id="{{ member.get('id') }}"
+                                                data-user-name="{{ member.get('displayName', '') }}"
+                                                {% if member.get('is_owner', False) or not access.teams.features.edit_teams_members %}disabled{% endif %}
+                                                {% if member.get('is_owner', False) %}title="Cannot remove team owner"{% endif %}>
+                                                <i class="bi bi-person-dash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="content-box table-box" style="max-width: 100%; overflow-x: hidden;">
+                <div class="card border-0">
+                    <div class="card-header" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); border-radius: 0 !important;">
+                        <h5 class="card-title mb-0 text-white">
+                            <i class="bi bi-person-plus-fill"></i> Available Users
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-transparent" 
+                                       id="availableUsersSearch" placeholder="Search users to add...">
+                            </div>
+                        </div>
+                        <div class="table-container" style="overflow-x: hidden;">
+                            <div class="table-responsive" style="overflow-x: hidden;">
+                                <div class="available-users" id="availableUsersList">
+                                    {% for user in users %}
+                                    <div class="list-group-item border-0 border-bottom user-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="fw-semibold text-white">{{ user.get('displayName', 'Name not available') }}</div>
+                                                <small style="color: var(--primary-3);">{{ user.get('userPrincipalName', 'Email not available') }}</small>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-success add-member"
+                                                data-user-id="{{ user.get('id') }}"
+                                                data-user-name="{{ user.get('displayName', '') }}"
+                                                {% if not access.teams.features.edit_teams_members %}disabled{% endif %}>
+                                                <i class="bi bi-person-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .object-list {
+        position: relative;
+        margin-top: 20px;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        overflow: hidden;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .content-box.mb-4 {
+        height: auto;
+        min-height: 0;
+    }
+    .table-responsive {
+        overflow-x: hidden;
+    }
+    .card {
+        border-radius: 0 !important;
+    }
+    .col-md-6 .content-box {
+        height: 100%;
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0;
+    }
+    .card-header {
+        padding: 0.75rem 1rem;
+        border: none;
+    }
+    .card-header.bg-gradient {
+        color: white;
+    }
+    .input-group {
+        padding: 0.4rem 0.75rem;
+    }
+    .bg-light {
+        background-color: transparent !important;
+    }
+    .border-bottom {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .members-list,
+    .available-users {
+        height: calc(100vh - var(--header-height) - 280px);
+        overflow-y: auto;
+    }
+    .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+    }
+    .search-container {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: rgba(18, 20, 29, 0.9);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    #search-items::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .list-group-item {
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05) !important;
+        background-color: transparent;
+        color: var(--gray-4);
+    }
+    .fw-semibold {
+        color: white !important;
+    }
+    .member-item small {
+        color: var(--primary-1) !important;
+    }
+    .user-item small {
+        color: var(--primary-3) !important;
+    }
+    .text-muted {
+        color: var(--primary-1) !important;
+    }
+    small.text-muted {
+        color: var(--primary-1) !important;
+    }
+    .list-group-item:hover {
+        background: rgba(255, 113, 91, 0.05);
+        transform: translateY(-1px);
+    }
+    .btn-outline-danger {
+        border-color: var(--primary-1);
+        color: var(--primary-1);
+        padding: 0.375rem 0.75rem;
+        background-color: transparent;
+    }
+    .btn-outline-danger:hover:not(:disabled) {
+        background: var(--primary-1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(255, 113, 91, 0.3);
+    }
+    .btn-outline-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: var(--gray-4);
+        color: var(--gray-4);
+    }
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+    }
+    .badge.bg-warning {
+        background-color: #ffc107 !important;
+        color: #000 !important;
+    }
+    .btn-success {
+        background: var(--primary-3);
+        border: none;
+        padding: 0.375rem 0.75rem;
+    }
+    .btn-success:hover {
+        background: var(--primary-2);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(60, 207, 145, 0.3);
+    }
+    .form-control {
+        padding: 0.25rem 0.5rem;
+        height: auto;
+        color: var(--white) !important;
+        background-color: transparent !important;
+    }
+    .form-control::placeholder {
+        color: var(--gray-4);
+        opacity: 0.7;
+    }
+    .form-control:focus {
+        box-shadow: none;
+        border-color: var(--primary-1);
+    }
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9040 !important;
+    }
+    .modal {
+        z-index: 9050 !important;
+    }
+    .modal-dialog {
+        z-index: 9060 !important;
+    }
+    .modal-content {
+        background: rgba(18, 20, 29, 0.95);
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        border-radius: 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 9070 !important;
+        color: var(--white);
+    }
+    .modal-header {
+        border-bottom: none;
+        padding: 1rem 1.5rem;
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+    #notificationMessage {
+        color: var(--white);
+        text-align: center;
+    }
+    .modal.fade .modal-dialog {
+        transition: transform .2s ease-out;
+        transform: scale(0.95);
+    }
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+    .btn-link {
+        color: var(--primary-1);
+    }
+    .btn-link:hover {
+        color: var(--primary-2);
+    }
+    .input-group-text {
+        padding: 0.25rem;
+    }
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.2em;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+
+    // Function to remove member with enhanced UI feedback
+    function removeMember(buttonElement, memberId, userName) {
+        // Show loading state
+        ShadowScopeUtils.showButtonLoading(buttonElement);
+
+        fetch(`/teams/{{ team.id }}/remove_member`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'  // Explicitly request JSON response
+            },
+            body: JSON.stringify({ member_id: memberId }),
+            credentials: 'same-origin'  // Send cookies (important for session)
+        })
+        .then(response => {
+            // Check if redirect to login page
+            if (response.redirected) {
+                throw new Error('Redirected to: ' + response.url);
+            }
+            
+            // Get the content type
+            const contentType = response.headers.get('content-type');
+            
+            // Parse response
+            return response.text().then(text => {
+                
+                // If it's JSON, parse it
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        const data = JSON.parse(text);
+                        return { ...data, status: response.status };
+                    } catch (e) {
+                        throw new Error('Response claimed to be JSON but failed to parse');
+                    }
+                } else {
+                    // Not JSON, show more context about the response
+                    const firstLine = text.split('\n')[0];
+                    throw new Error(`Server returned non-JSON response: ${firstLine}`);
+                }
+            });
+        })
+        .then(data => {
+            // Restore button state
+            ShadowScopeUtils.restoreButtonState(buttonElement);
+            
+            if (data.success) {
+                // Show success message
+                ShadowScopeUtils.showNotification(`${userName} was successfully removed from the team!`);
+                
+                // Remove the member's row from the UI with animation
+                const memberRow = buttonElement.closest('.list-group-item');
+                memberRow.style.transition = 'opacity 0.5s, transform 0.5s';
+                memberRow.style.opacity = '0';
+                memberRow.style.transform = 'translateX(20px)';
+                
+                // After animation completes, reload the page to refresh the lists
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                // Show error message
+                const errorMsg = data.message || 'Error removing member';
+                ShadowScopeUtils.showNotification(errorMsg, true);
+            }
+        })
+        .catch(error => {
+            // Restore button state
+            ShadowScopeUtils.restoreButtonState(buttonElement);
+
+            // Check if user is being redirected to login
+            if (error.message.includes('Redirected to:') && 
+                error.message.includes('/login')) {
+                ShadowScopeUtils.showNotification('Your session has expired. Redirecting to login page...', true);
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            }
+            // Check if response contains HTML (likely an error page)
+            else if (error.message.includes('<!doctype') || 
+                     error.message.includes('<html')) {
+                ShadowScopeUtils.showNotification('Server returned an HTML error page. Please check your console and server logs.', true);
+            } 
+            else {
+                // Regular error
+                ShadowScopeUtils.showNotification('Error removing member: ' + error.message, true);
+            }
+        });
+    }
+
+    // Function to add member with enhanced UI feedback
+    function addMember(buttonElement, userId, userName) {
+        // Show loading state
+        ShadowScopeUtils.showButtonLoading(buttonElement);
+        
+        fetch(`/teams/{{ team.id }}/add_member`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ member_id: userId }),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            
+            // Verificar se a resposta é HTML
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                throw new Error('Server returned HTML instead of JSON');
+            }
+            
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`Server responded with ${response.status}: ${text.substring(0, 100)}...`);
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            // Restore button state
+            ShadowScopeUtils.restoreButtonState(buttonElement);
+            
+            if (data.success) {
+                // Show success message
+                ShadowScopeUtils.showNotification(`${userName} was successfully added to the team!`);
+                
+                // Hide the user's row with animation
+                const userRow = buttonElement.closest('.list-group-item');
+                userRow.style.transition = 'opacity 0.5s, transform 0.5s';
+                userRow.style.opacity = '0';
+                userRow.style.transform = 'translateX(-20px)';
+                
+                // After animation completes, reload the page to refresh the lists
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                // Show error message
+                const errorMsg = data.message || 'Error adding member';
+                ShadowScopeUtils.showNotification(errorMsg, true);
+            }
+        })
+        .catch(error => {
+            // Restore button state
+            ShadowScopeUtils.restoreButtonState(buttonElement);
+
+            // Check different error types
+            if (error.message === 'Failed to fetch') {
+                ShadowScopeUtils.showNotification('Connection error: Unable to connect to the server. Please check your internet connection.', true);
+            }
+            else if (error.message.includes('Server returned HTML')) {
+                ShadowScopeUtils.showNotification('Your session may have expired. Please log in again.', true);
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            }
+            else if (error.message.includes('401')) {
+                ShadowScopeUtils.showNotification('Your session has expired. Redirecting to login page...', true);
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+            }
+            else {
+                ShadowScopeUtils.showNotification('Error adding member: ' + error.message, true);
+            }
+        });
+    }
+
+    // Event Listeners for the buttons
+    document.querySelectorAll('.remove-member').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            
+            // Check if button is disabled (owner)
+            if (this.disabled) {
+                ShadowScopeUtils.showNotification('Cannot remove team owners. Teams must have at least one owner.', true);
+                return;
+            }
+            
+            const memberId = this.dataset.memberId;
+            const userName = this.dataset.userName;
+            
+            // Remove member directly
+            removeMember(this, memberId, userName);
+        });
+    });
+
+    document.querySelectorAll('.add-member').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const userId = this.dataset.userId;
+            const userName = this.dataset.userName;
+            
+            // Add member directly
+            addMember(this, userId, userName);
+        });
+    });
+
+    // Search functionality for current members
+    document.getElementById('currentMembersSearch').addEventListener('input', function(e) {
+        const searchText = e.target.value.toLowerCase();
+        document.querySelectorAll('#currentMembersList .list-group-item').forEach(item => {
+            const userName = item.querySelector('.fw-semibold').textContent.toLowerCase();
+            const userEmail = item.querySelector('small').textContent.toLowerCase();
+            if (userName.includes(searchText) || userEmail.includes(searchText)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+
+    // Search functionality for available users
+    document.getElementById('availableUsersSearch').addEventListener('input', function(e) {
+        const searchText = e.target.value.toLowerCase();
+        document.querySelectorAll('#availableUsersList .list-group-item').forEach(item => {
+            const userName = item.querySelector('.fw-semibold').textContent.toLowerCase();
+            const userEmail = item.querySelector('small').textContent.toLowerCase();
+            if (userName.includes(searchText) || userEmail.includes(searchText)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

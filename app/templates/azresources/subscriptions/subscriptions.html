@@ -1,0 +1,432 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 0;
+        overflow: hidden;
+        border: none;
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0;
+        background: var(--gray-1);
+    }
+    .table-standard {
+        font-size: 0.85rem;
+    }
+    .table-standard td {
+        padding: 0.4rem 0.6rem;
+        height: 36px;
+        line-height: 1.2;
+    }
+    .table-standard th {
+        padding: 0.5rem 0.6rem;
+        height: 38px;
+        font-size: 0.75rem;
+    }
+    .table {
+        --bs-table-hover-bg: rgba(255, 113, 91, 0.05);
+        --bs-table-bg: rgba(18, 20, 29, 0.8) !important;
+        --bs-table-color: var(--gray-4) !important;
+        --bs-table-border-color: rgba(255, 113, 91, 0.1) !important;
+        margin-bottom: 0;
+        background: rgba(18, 20, 29, 0.8) !important;
+        color: var(--gray-4);
+        table-layout: auto;
+        width: 100%;
+        border-color: transparent !important;
+    }
+    .table th:nth-child(2),
+    .table td:nth-child(2) {
+        min-width: 200px;
+        width: auto;
+    }
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        min-width: 280px;
+        width: auto;
+    }
+    .table th:nth-child(4),
+    .table td:nth-child(4) {
+        min-width: 120px;
+        width: auto;
+    }
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        white-space: normal;
+        word-wrap: break-word;
+        min-width: 250px;
+        width: auto;
+    }
+    .table th:nth-child(6),
+    .table td:nth-child(6) {
+        width: 200px;
+        min-width: 200px;
+        white-space: nowrap;
+    }
+    .table td:nth-child(6) .d-flex {
+        flex-wrap: nowrap;
+        gap: 0.5rem;
+    }
+    .table tbody tr {
+        background-color: rgba(18, 20, 29, 0.8) !important;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(255, 113, 91, 0.05) !important;
+    }
+    .table th {
+        position: sticky;
+        top: 0;
+        background: rgba(18, 20, 29, 0.9);
+        z-index: 1;
+        color: var(--primary-1);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 0.5rem 0.6rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.2);
+        height: 38px;
+    }
+    .table td {
+        padding: 0.4rem 0.6rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05);
+        overflow: visible;
+        line-height: 1.4;
+        min-height: 36px;
+    }
+    .details-row {
+        background: rgba(18, 20, 29, 0.95);
+    }
+    .details-content {
+        background: rgba(18, 20, 29, 0.95);
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .json-viewer {
+        background: rgba(18, 20, 29, 0.95);
+        color: var(--gray-4);
+        font-size: 0.75rem;
+        margin: 0;
+        padding: 0;
+        border: none;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .toggle-details {
+        color: var(--primary-1);
+        border: none;
+        background: transparent;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+    }
+    .toggle-details:hover {
+        color: var(--primary-2);
+    }
+    .toggle-details i {
+        transition: transform 0.2s ease;
+    }
+    .toggle-details.active i {
+        transform: rotate(90deg);
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .table-responsive {
+        position: relative;
+        overflow-y: auto;
+        max-height: 600px;
+        min-height: 400px;
+        border: none !important;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    code {
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--primary-1);
+        padding: 0.2rem 0.3rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+    }
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .info-panel {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box mb-2 info-panel">
+        <div class="d-flex justify-content-between align-items-center p-2">
+            <h5 class="mb-0 ps-2" style="font-size: 0.95rem;">
+                <i class="bi bi-key-fill me-2" style="color: var(--primary-1);"></i> Subscriptions
+            </h5>
+            <div class="d-flex gap-2 align-items-center">
+                {% if cache_time %}
+                <span class="text-muted" style="font-size: 0.75rem;">
+                    <i class="bi bi-clock-history me-1"></i> Cached: {{ cache_time }}
+                </span>
+                {% endif %}
+                <a href="{{ url_for('subscriptions.refresh_subscriptions') }}" class="btn btn-outline-primary py-1 px-2"
+                    style="font-size: 0.8rem; height: 28px;"
+                    title="Refresh subscriptions data from API">
+                    <i class="bi bi-arrow-repeat"></i> Refresh
+                </a>
+                <button id="export-csv" class="btn btn-primary py-1 px-2" style="font-size: 0.8rem; height: 28px;">
+                    <i class="bi bi-download"></i> Export CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-box table-box">
+        <div class="card">
+            <div class="card-body">
+                <div class="p-2 border-bottom" style="background: rgba(18, 20, 29, 0.8); border-bottom: 1px solid rgba(255, 113, 91, 0.1);">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                            <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                        </span>
+                        <input type="text" class="form-control border-0 bg-transparent py-1" id="subSearch" 
+                            placeholder="Search subscriptions..." 
+                            style="
+                                background-color: rgba(18, 20, 29, 0.6) !important;
+                                color: var(--gray-4);
+                                border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                height: 32px;
+                            ">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table" class="table table-hover table-standard mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px"></th>
+                                <th>Name</th>
+                                <th>Subscription ID</th>
+                                <th>Status</th>
+                                <th>Roles Assigned</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if subscriptions %}
+                                {% for sub in subscriptions %}
+                                <tr class="item-row" data-item-id="{{ sub.id }}">
+                                    <td>
+                                        <button class="btn btn-sm btn-link p-0 toggle-details">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-key-fill me-2" style="color: var(--primary-1);"></i>
+                                        <span class="text-white">{{ sub.name or 'N/A' }}</span>
+                                    </td>
+                                    <td>
+                                        <code class="list-id" style="font-size: 0.75rem;">{{ sub.id or 'N/A' }}</code>
+                                    </td>
+                                    <td>
+                                        {% if sub.state == 'Enabled' %}
+                                        <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                                            Enabled
+                                        </span>
+                                        {% else %}
+                                        <span class="badge" style="background: rgba(255, 113, 91, 0.2); color: var(--primary-1);">
+                                            {{ sub.state or 'Disabled' }}
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if sub.roles %}
+                                            {% for role in sub.roles %}
+                                            <span class="badge" style="background: rgba(255, 113, 91, 0.2); color: var(--primary-1);" title="{{ role.description }}">
+                                                {{ role.name }}
+                                            </span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if sub.inheritedRoles %}
+                                            {% for role in sub.inheritedRoles %}
+                                            <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;" title="Inherited from {{ role.inheritedFrom }} ({{ role.inheritedFromType }}): {{ role.description }}">
+                                                {{ role.name }} <small class="ms-1">(Inherited)</small>
+                                            </span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% if not sub.roles and not sub.inheritedRoles %}
+                                            <span class="text-muted">No roles assigned</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-nowrap gap-2">
+                                            <a href="{{ url_for('subscriptions.subscription_details', subscription_id=sub.id) }}" 
+                                               class="btn btn-sm btn-primary py-0 px-2"
+                                               style="font-size: 0.75rem; height: 24px;">
+                                                <i class="bi bi-eye" style="font-size: 0.75rem"></i> View Details
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="details-row d-none" data-item-id="{{ sub.id }}">
+                                    <td colspan="6" class="p-0">
+                                        <div class="details-content p-3">
+                                            <pre class="json-viewer">{{ sub|tojson(indent=2) }}</pre>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            No subscriptions found.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle details rows
+    document.querySelectorAll('.toggle-details').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const itemId = row.dataset.itemId;
+            const detailsRow = document.querySelector(`.details-row[data-item-id="${itemId}"]`);
+            
+            if (detailsRow) {
+                detailsRow.classList.toggle('d-none');
+                this.classList.toggle('active');
+            }
+        });
+    });
+
+    // Search functionality
+    document.getElementById('subSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        document.querySelectorAll('.item-row').forEach(row => {
+            const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const id = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            const status = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const roles = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+            
+            if (name.includes(searchTerm) || id.includes(searchTerm) || status.includes(searchTerm) || roles.includes(searchTerm)) {
+                row.style.display = '';
+                const detailsRow = document.querySelector(`.details-row[data-item-id="${row.dataset.itemId}"]`);
+                if (detailsRow && !detailsRow.classList.contains('d-none')) {
+                    detailsRow.style.display = '';
+                }
+            } else {
+                row.style.display = 'none';
+                const detailsRow = document.querySelector(`.details-row[data-item-id="${row.dataset.itemId}"]`);
+                if (detailsRow) {
+                    detailsRow.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    // Export to CSV
+    function exportToCSV() {
+        const table = document.getElementById('data-table');
+        const rows = table.querySelectorAll('.item-row');
+        let csvContent = '';
+
+        // Headers
+        csvContent += 'Name,Subscription ID,Status,Roles Assigned\n';
+
+        // Data
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cells = Array.from(row.querySelectorAll('td'));
+                const name = cells[1].textContent.trim();
+                const id = cells[2].textContent.trim();
+                const status = cells[3].textContent.trim();
+                const roles = cells[4].textContent.trim();
+                
+                const values = [name, id, status, roles].map(value => {
+                    if (value.includes(',') || value.includes('"')) {
+                        return `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value;
+                });
+                csvContent += values.join(',') + '\n';
+            }
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Subscriptions.csv';
+        link.click();
+    }
+    
+    // Event listeners
+    document.getElementById('export-csv').addEventListener('click', exportToCSV);
+</script>
+{% endblock %}

@@ -1,0 +1,2 @@
+"""EntraID routes package."""
+
