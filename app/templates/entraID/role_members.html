@@ -1,0 +1,857 @@
+{% extends "dashboard.html" %}
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .object-list {
+        position: relative;
+        margin-top: 20px;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        overflow: hidden;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .content-box.mb-4 {
+        height: auto;
+        min-height: 0;
+    }
+    .table-responsive {
+        overflow-x: hidden;
+    }
+    .card {
+        border-radius: 0 !important;
+    }
+    .col-md-6 .content-box {
+        height: 100%;
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0;
+    }
+    .card-header {
+        padding: 0.75rem 1rem;
+        border: none;
+    }
+    .card-header.bg-gradient {
+        color: white;
+    }
+    .input-group {
+        padding: 0.4rem 0.75rem;
+    }
+    .bg-light {
+        background-color: transparent !important;
+    }
+    .border-bottom {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .members-list,
+    .available-users {
+        height: calc(100vh - var(--header-height) - 280px);
+        overflow-y: auto;
+    }
+    .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 12px;
+        overflow: hidden;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+    }
+    .search-container {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: rgba(18, 20, 29, 0.9);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    #search-items::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .list-group-item {
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05) !important;
+        background-color: transparent;
+        color: var(--gray-4);
+    }
+    .fw-semibold {
+        color: white !important;
+    }
+    .member-item small {
+        color: var(--primary-1) !important;
+    }
+    .user-item small {
+        color: var(--primary-3) !important;
+    }
+    .text-muted {
+        color: var(--primary-1) !important;
+    }
+    small.text-muted {
+        color: var(--primary-1) !important;
+    }
+    .list-group-item:hover {
+        background: rgba(255, 113, 91, 0.05);
+        transform: translateY(-1px);
+    }
+    .btn-outline-danger {
+        border-color: var(--primary-1);
+        color: var(--primary-1);
+        padding: 0.375rem 0.75rem;
+        background-color: transparent;
+    }
+    .btn-outline-danger:hover {
+        background: var(--primary-1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(255, 113, 91, 0.3);
+    }
+    .btn-success {
+        background: var(--primary-3);
+        border: none;
+        padding: 0.375rem 0.75rem;
+    }
+    .btn-success:hover {
+        background: var(--primary-2);
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(60, 207, 145, 0.3);
+    }
+    .form-control {
+        padding: 0.25rem 0.5rem;
+        height: auto;
+        color: var(--white) !important;
+        background-color: transparent !important;
+    }
+    .form-control::placeholder {
+        color: var(--gray-4);
+        opacity: 0.7;
+    }
+    .form-control:focus {
+        box-shadow: none;
+        border-color: var(--primary-1);
+    }
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9040 !important;
+    }
+    .modal {
+        z-index: 9050 !important;
+    }
+    .modal-dialog {
+        z-index: 9060 !important;
+    }
+    .modal-content {
+        background: rgba(18, 20, 29, 0.95);
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        border-radius: 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        z-index: 9070 !important;
+        color: var(--white);
+    }
+    .modal-header {
+        border-bottom: none;
+        padding: 1rem 1.5rem;
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+    #notificationMessage {
+        color: var(--white);
+        text-align: center;
+    }
+    .modal.fade .modal-dialog {
+        transition: transform .2s ease-out;
+        transform: scale(0.95);
+    }
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+    .btn-link {
+        color: var(--primary-1);
+    }
+    .btn-link:hover {
+        color: var(--primary-2);
+    }
+    .input-group-text {
+        padding: 0.25rem;
+    }
+    .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.2em;
+    }
+</style>
+
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); color: white; border-radius: 0 !important;">
+                <h5 class="modal-title" id="statusModalLabel">
+                    <i class="bi bi-info-circle me-2"></i>Notification
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="statusMessage" class="mb-0 fs-5"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="object-list" style="overflow-x: hidden; max-width: 100%;">
+    <div class="content-box mb-4" style="overflow-x: hidden; max-width: 100%;">
+        <div class="d-flex justify-content-between align-items-center p-2">
+            <h5 class="mb-0 ps-2">
+                <a href="{{ url_for('roles.list_roles') }}" class="text-decoration-none me-2">
+                    <i class="bi bi-person-badge" style="color: var(--primary-1);"></i> Roles
+                </a>
+                <i class="bi bi-chevron-right" style="color: var(--gray-4);"></i>
+                <span class="ms-2">{{ role.displayName }} <small class="badge ms-2" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); border-radius: 0;">{{ members|length }}</small></span>
+            </h5>
+            <div class="d-flex gap-2 align-items-center">
+                {% if access.roles.features.manage_role_assignments %}
+                <button id="export-csv" class="btn btn-outline-primary">
+                    <i class="bi bi-download"></i> Export CSV
+                </button>
+                <button id="refresh-members" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-repeat"></i> Refresh
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" style="margin-right: 0; margin-left: 0;">
+        <div class="col-md-6">
+            <div class="content-box table-box" style="max-width: 100%; overflow-x: hidden;">
+                <div class="card border-0">
+                    <div class="card-header" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); border-radius: 0 !important;">
+                        <h5 class="card-title mb-0 text-white">
+                            <i class="bi bi-person-check-fill"></i> Current Members
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-transparent" 
+                                       id="search-members" placeholder="Search current members...">
+                            </div>
+                        </div>
+                        <div class="members-list">
+                            {% if members %}
+                                {% for member in members %}
+                                <div class="list-group-item border-0 border-bottom member-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-semibold text-white">{{ member.displayName }}</div>
+                                            <small style="color: var(--primary-1);">{{ member.userPrincipalName or member.id }}</small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-member"
+                                            data-member-id="{{ member.id }}"
+                                            data-user-name="{{ member.displayName }}"
+                                            data-user-email="{{ member.userPrincipalName }}"
+                                            {% if not access.roles.features.manage_role_assignments %}disabled{% endif %}>
+                                            <i class="bi bi-person-dash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="p-4 text-center">
+                                    <i class="bi bi-people" style="font-size: 3rem; color: var(--primary-1);"></i>
+                                    <h5 class="mt-3">No Members Found</h5>
+                                    <p style="color: var(--gray-4);">This role currently has no members assigned.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="content-box table-box" style="max-width: 100%; overflow-x: hidden;">
+                <div class="card border-0">
+                    <div class="card-header" style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); border-radius: 0 !important;">
+                        <h5 class="card-title mb-0 text-white">
+                            <i class="bi bi-person-plus-fill"></i> Available Users
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="border-bottom">
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="text" class="form-control border-0 bg-transparent" 
+                                       id="search-users" placeholder="Search users to add...">
+                            </div>
+                        </div>
+                        <div class="available-users">
+                            <div id="users-loading" class="p-4 text-center">
+                                <i class="bi bi-arrow-repeat spin" style="font-size: 2rem; color: var(--primary-1);"></i>
+                                <h5 class="mt-3">Loading Available Users</h5>
+                                <p style="color: var(--gray-4);">Please wait while we load available users...</p>
+                            </div>
+                            <div id="users-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Add a special script tag to pass Flask/Jinja variables to JavaScript #}
+<script id="data-container" type="application/json">
+{
+    "hasManageRoleAssignments": {{ access.roles.features.manage_role_assignments|tojson }},
+    "roleId": "{{ role.id }}"
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Wait for Bootstrap to load
+document.addEventListener('DOMContentLoaded', function() {
+    // Get server-side data without mixing Jinja2 syntax in JS
+    const dataContainer = document.getElementById('data-container');
+    const serverData = JSON.parse(dataContainer.textContent);
+    const hasManageRoleAssignments = serverData.hasManageRoleAssignments;
+    const roleId = serverData.roleId;
+
+    // Initialize Bootstrap Modal
+    const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+    // Search functionality for members
+    document.getElementById('search-members').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.member-item').forEach(item => {
+            const name = item.querySelector('.fw-semibold').textContent.toLowerCase();
+            const details = item.querySelector('small').textContent.toLowerCase();
+            item.style.display = name.includes(searchTerm) || details.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Search functionality for users
+    document.getElementById('search-users').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.user-item').forEach(item => {
+            const name = item.querySelector('.fw-semibold').textContent.toLowerCase();
+            const details = item.querySelector('small').textContent.toLowerCase();
+            item.style.display = name.includes(searchTerm) || details.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Export to CSV functionality
+    document.getElementById('export-csv')?.addEventListener('click', function() {
+        // Get all members
+        const members = [];
+        
+        document.querySelectorAll('.member-item').forEach(item => {
+            const name = item.querySelector('.fw-semibold').textContent.trim();
+            const email = item.querySelector('small').textContent.trim();
+            const btnData = item.querySelector('button');
+            const id = btnData ? btnData.getAttribute('data-member-id') : '';
+            
+            members.push({
+                name,
+                email,
+                id
+            });
+        });
+        
+        if (members.length === 0) {
+            ShadowScopeNotifications.warning('No members to export');
+            return;
+        }
+        
+        // Create CSV content
+        let csvContent = 'Display Name,User Principal Name,ID\n';
+        members.forEach(member => {
+            let name = member.name;
+            let email = member.email;
+            
+            // Handle special characters
+            if (name.includes('"') || name.includes(',')) {
+                name = `"${name.replace(/"/g, '""')}"`;
+            }
+            
+            if (email.includes('"') || email.includes(',')) {
+                email = `"${email.replace(/"/g, '""')}"`;
+            }
+            
+            csvContent += `${name},${email},${member.id}\n`;
+        });
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${document.querySelector('.ms-2').textContent.trim()}_members.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        ShadowScopeNotifications.success('Members exported successfully');
+    });
+
+    // Function to remove member directly
+    async function removeMemberDirect(memberId, userName, userEmail) {
+        // Prevent multiple executions
+        const button = document.querySelector(`[data-member-id="${memberId}"]`);
+        if (button && button.hasAttribute('data-processing')) {
+            return;
+        }
+        if (button) {
+            button.setAttribute('data-processing', 'true');
+        }
+        
+        try {
+            const response = await fetch(`/roles/${roleId}/members/${memberId}/remove`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                // Remove the member from the list
+                const memberItem = document.querySelector(`[data-member-id="${memberId}"]`);
+                if (memberItem) {
+                    memberItem.closest('.member-item').remove();
+                }
+                
+                // Update the member count
+                updateMemberCount(-1);
+                
+                // Add the user back to the available users list
+                addUserToAvailable(memberId, userName, userEmail);
+                
+                ShadowScopeNotifications.success(`Successfully removed ${userName} from the role`);
+            } else {
+                const data = await response.json();
+                ShadowScopeNotifications.error(data.message || 'Failed to remove member');
+            }
+        } catch (error) {
+            ShadowScopeNotifications.error('Error removing member. Check console for details.');
+        } finally {
+            // Remove processing flag
+            if (button) {
+                button.removeAttribute('data-processing');
+            }
+        }
+    }
+
+    // Function to add event listener to remove member buttons
+    function addRemoveMemberListener(button) {
+        button.addEventListener('click', async function() {
+            // Skip if button is disabled
+            if (this.disabled) {
+                return;
+            }
+            
+            const memberId = this.getAttribute('data-member-id');
+            const userName = this.getAttribute('data-user-name');
+            const userEmail = this.getAttribute('data-user-email');
+            
+            // Execute removal directly (no confirmation needed)
+            removeMemberDirect(memberId, userName, userEmail);
+        });
+    }
+
+    // Add event listeners to remove buttons
+    document.querySelectorAll('.remove-member').forEach(button => {
+        addRemoveMemberListener(button);
+    });
+
+    // Function to add event listener to add member buttons
+    function addAddMemberListener(button) {
+        button.addEventListener('click', async function() {
+            // Skip if button is disabled or processing
+            if (this.disabled || this.hasAttribute('data-processing')) {
+                return;
+            }
+            
+            // Prevent multiple executions
+            this.setAttribute('data-processing', 'true');
+            
+            const userId = this.getAttribute('data-user-id');
+            const userName = this.getAttribute('data-user-name');
+            const userEmail = this.getAttribute('data-user-email');
+            
+            try {
+                // Adding user to role
+                
+                const response = await fetch(`/roles/${roleId}/members/add`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ member_id: userId })
+                });
+                
+                if (response.ok) {
+                    // Remove the user from available users list immediately
+                    const userItem = this.closest('.user-item');
+                    if (userItem) {
+                        userItem.remove();
+                    }
+                    
+                    // Add the member directly to the members list
+                    const membersList = document.querySelector('.members-list');
+                    
+                    // Check if we need to remove the "No Members Found" message
+                    const noMembersMsg = membersList.querySelector('.p-4.text-center');
+                    if (noMembersMsg) {
+                        noMembersMsg.remove();
+                    }
+                    
+                    // Create the new member item
+                    const memberItem = document.createElement('div');
+                    memberItem.className = 'list-group-item border-0 border-bottom member-item';
+                    
+                    // Set the inner HTML content
+                    memberItem.innerHTML = 
+                        '<div class="d-flex justify-content-between align-items-center">' +
+                            '<div>' +
+                                '<div class="fw-semibold">' + userName + '</div>' +
+                                '<small style="color: var(--primary-1);">' + (userEmail || userId) + '</small>' +
+                            '</div>' +
+                            '<button type="button" class="btn btn-sm btn-outline-danger remove-member" ' +
+                                'data-member-id="' + userId + '" ' +
+                                'data-user-name="' + userName + '" ' +
+                                'data-user-email="' + (userEmail || '') + '">' +
+                                '<i class="bi bi-person-dash"></i>' +
+                            '</button>' +
+                        '</div>';
+                    
+                    // Add to the members list
+                    membersList.appendChild(memberItem);
+                    
+                    // Add event listener to the new remove button
+                    const removeButton = memberItem.querySelector('.remove-member');
+                    addRemoveMemberListener(removeButton);
+                    
+                    // Update member count
+                    updateMemberCount(1);
+                    
+                    ShadowScopeNotifications.success(`Successfully added ${userName} to the role`);
+                } else {
+                    const data = await response.json();
+                    ShadowScopeNotifications.error(data.message || 'Failed to add member');
+                }
+            } catch (error) {
+                ShadowScopeNotifications.error('Error adding member. Check console for details.');
+            } finally {
+                // Remove processing flag
+                this.removeAttribute('data-processing');
+            }
+        });
+    }
+
+    // Function to add user to available users list
+    function addUserToAvailable(userId, userName, userEmail) {
+        // First check if user is already in members list - this is the key logic
+        const existingMember = document.querySelector(`.member-item button[data-member-id="${userId}"]`);
+        if (existingMember) {
+            // User already a member
+            return; // Skip if already a member
+        }
+        
+        // Also check if already in available users list
+        const existingAvailable = document.querySelector(`.user-item button[data-user-id="${userId}"]`);
+        if (existingAvailable) {
+            // User already in available list
+            return; // Skip if already in available list
+        }
+        
+        const usersContainer = document.getElementById('users-container');
+        
+        const userItem = document.createElement('div');
+        userItem.className = 'list-group-item border-0 border-bottom user-item';
+        
+        // Create the content elements directly instead of using innerHTML
+        const container = document.createElement('div');
+        container.className = 'd-flex justify-content-between align-items-center';
+        
+        const infoDiv = document.createElement('div');
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'fw-semibold';
+        nameDiv.textContent = userName;
+        
+        const emailSmall = document.createElement('small');
+        emailSmall.style.color = 'var(--primary-3)';
+        emailSmall.textContent = userEmail || userId;
+        
+        infoDiv.appendChild(nameDiv);
+        infoDiv.appendChild(emailSmall);
+        
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'btn btn-sm btn-success add-member';
+        addButton.dataset.userId = userId;
+        addButton.dataset.userName = userName;
+        addButton.dataset.userEmail = userEmail || '';
+        
+        if (!hasManageRoleAssignments) {
+            addButton.disabled = true;
+        }
+        
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-person-plus';
+        addButton.appendChild(icon);
+        
+        container.appendChild(infoDiv);
+        container.appendChild(addButton);
+        userItem.appendChild(container);
+        
+        usersContainer.appendChild(userItem);
+        
+        // Add event listener to the new button
+        addAddMemberListener(addButton);
+    }
+
+    // Function to add user to members list
+    function addUserToMembers(userId, userName, userEmail) {
+        const membersList = document.querySelector('.members-list');
+        
+        // Check if we need to remove the "No Members Found" message
+        const noMembersMsg = membersList.querySelector('.p-4.text-center');
+        if (noMembersMsg) {
+            noMembersMsg.remove();
+        }
+        
+        const memberItem = document.createElement('div');
+        memberItem.className = 'list-group-item border-0 border-bottom member-item';
+        
+        // Create the content elements directly instead of using innerHTML
+        const container = document.createElement('div');
+        container.className = 'd-flex justify-content-between align-items-center';
+        
+        const infoDiv = document.createElement('div');
+        
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'fw-semibold';
+        nameDiv.textContent = userName;
+        
+        const emailSmall = document.createElement('small');
+        emailSmall.style.color = 'var(--primary-1)';
+        emailSmall.textContent = userEmail || userId;
+        
+        infoDiv.appendChild(nameDiv);
+        infoDiv.appendChild(emailSmall);
+        
+        const btnRemoveMember = document.createElement('button');
+        btnRemoveMember.type = 'button';
+        btnRemoveMember.className = 'btn btn-sm btn-outline-danger remove-member';
+        btnRemoveMember.dataset.memberId = userId;
+        btnRemoveMember.dataset.userName = userName;
+        btnRemoveMember.dataset.userEmail = userEmail || '';
+        
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-person-dash';
+        btnRemoveMember.appendChild(icon);
+        
+        container.appendChild(infoDiv);
+        container.appendChild(btnRemoveMember);
+        memberItem.appendChild(container);
+        
+        // Add to members list at proper position (sort alphabetically)
+        let inserted = false;
+        const items = membersList.querySelectorAll('.member-item');
+        for (let i = 0; i < items.length; i++) {
+            const itemName = items[i].querySelector('.fw-semibold').textContent;
+            if (userName.localeCompare(itemName) < 0) {
+                membersList.insertBefore(memberItem, items[i]);
+                inserted = true;
+                break;
+            }
+        }
+        
+        if (!inserted) {
+            membersList.appendChild(memberItem);
+        }
+        
+        // Add event listener to the new button
+        addRemoveMemberListener(btnRemoveMember);
+    }
+
+    // Function to update member count
+    function updateMemberCount(change) {
+        const badge = document.querySelector('.badge');
+        const currentCount = parseInt(badge.textContent);
+        badge.textContent = currentCount + change;
+    }
+
+    // Load available users
+    async function loadAvailableUsers() {
+        try {
+            // Get current member IDs from the initial template
+            let memberIds = [];
+            {% for member in members %}
+            memberIds.push('{{ member.id }}');
+            {% endfor %}
+            
+            // Also check for any members added dynamically since page load
+            const currentMemberElements = document.querySelectorAll('.member-item');
+            currentMemberElements.forEach(element => {
+                const button = element.querySelector('.remove-member');
+                if (button) {
+                    const memberId = button.getAttribute('data-member-id');
+                    if (memberId && !memberIds.includes(memberId)) {
+                        memberIds.push(memberId);
+                    }
+                }
+            });
+            
+            // Excluding existing members
+            
+            // Fetch all users
+            const response = await fetch('/users');
+            if (!response.ok) {
+                throw new Error('Failed to fetch users');
+            }
+            
+            const html = await response.text();
+            
+            // Parse the HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Extract users from the response
+            const userItems = doc.querySelectorAll('tr.item-row');
+            
+            // Hide loading indicator
+            document.getElementById('users-loading').style.display = 'none';
+            
+            // Check if we found any users
+            if (userItems.length === 0) {
+                const noUsersHtml = 
+                    '<div class="p-4 text-center">' +
+                        '<i class="bi bi-exclamation-circle" style="font-size: 3rem; color: var(--primary-1);"></i>' +
+                        '<h5 class="mt-3">No Users Found</h5>' +
+                        '<p style="color: var(--gray-4);">No users available to add to this role.</p>' +
+                    '</div>';
+                
+                document.getElementById('users-container').innerHTML = noUsersHtml;
+                return;
+            }
+            
+            // Clear existing users container
+            document.getElementById('users-container').innerHTML = '';
+            
+            // Create an array to store available users
+            const usersArray = [];
+            
+            // Find users that aren't already members
+            userItems.forEach(item => {
+                const userId = item.getAttribute('data-item-id');
+                
+                // Skip this user if they're already a member
+                if (userId && !memberIds.includes(userId)) {
+                    // Extract the user principal name from the second column
+                    const userPrincipalNameCell = item.querySelector('td:nth-child(2)');
+                    const userNameElement = userPrincipalNameCell ? userPrincipalNameCell.querySelector('.text-white') : null;
+                    const userName = userNameElement ? userNameElement.textContent.trim() : 'Unknown User';
+                    
+                    // Get the user email which is the same as userPrincipalName in this case
+                    const userEmail = userName;
+                    
+                    usersArray.push({userId, userName, userEmail});
+                }
+            });
+            
+            // Check if any available users were found
+            if (usersArray.length === 0) {
+                const allMembersHtml = 
+                    '<div class="p-4 text-center">' +
+                        '<i class="bi bi-info-circle" style="font-size: 3rem; color: var(--primary-3);"></i>' +
+                        '<h5 class="mt-3">All Users Already Members</h5>' +
+                        '<p style="color: var(--gray-4);">All available users are already members of this role.</p>' +
+                    '</div>';
+                
+                document.getElementById('users-container').innerHTML = allMembersHtml;
+                return;
+            }
+            
+            // Sort by display name
+            usersArray.sort((a, b) => a.userName.localeCompare(b.userName));
+            
+            // Add each user to the available list
+            usersArray.forEach(user => {
+                addUserToAvailable(user.userId, user.userName, user.userEmail);
+            });
+            
+        } catch (error) {
+            // Hide loading indicator
+            const loadingElement = document.getElementById('users-loading');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+            
+            const errorHtml = 
+                '<div class="p-4 text-center">' +
+                    '<i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: var(--primary-1);"></i>' +
+                    '<h5 class="mt-3">Error Loading Users</h5>' +
+                    '<p style="color: var(--gray-4);">There was an error loading available users.</p>' +
+                '</div>';
+            
+            const containerElement = document.getElementById('users-container');
+            if (containerElement) {
+                containerElement.innerHTML = errorHtml;
+            }
+        }
+    }
+    
+    // Start loading users immediately
+    loadAvailableUsers();
+    
+    // Add functionality for refresh button
+    document.getElementById('refresh-members')?.addEventListener('click', function() {
+        // Clear existing users
+        document.getElementById('users-container').innerHTML = '';
+        
+        // Show loading indicator
+        document.getElementById('users-loading').style.display = 'block';
+        
+        // Refresh the available users list
+        loadAvailableUsers();
+    });
+});
+</script>
+{% endblock %} 

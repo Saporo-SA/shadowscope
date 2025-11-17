@@ -1,0 +1,1000 @@
+{% extends "dashboard.html" %}
+{% from 'entraID/permission_info.html' import render_permissions %}
+{% block dynamic_content %}
+
+<div class="modal fade" id="secretModal" tabindex="-1" aria-labelledby="secretModalLabel" aria-hidden="true" style="z-index: 2000 !important;">
+    <div class="modal-dialog modal-dialog-centered" style="margin-top: 100px;">
+        <div class="modal-content" style="background: rgba(18, 20, 29, 0.95); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.2);">
+            <style>
+                #secretModal {
+                    z-index: 2000 !important;
+                }
+                .modal-backdrop.show + .modal-backdrop.show {
+                    z-index: 1999 !important;
+                }
+                #addSecretBtn.disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                    background-color: #6c757d !important;
+                    border-color: #6c757d !important;
+                }
+            </style>
+            <div class="modal-header"
+                style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); color: white; border-radius: 0 !important;">
+                <h5 class="modal-title" id="secretModalLabel">
+                    <i class="bi bi-key-fill me-2"></i>New Secret Generated
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert" style="background: rgba(255, 113, 91, 0.1); border: 1px solid rgba(255, 113, 91, 0.2); color: var(--gray-4);">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color: var(--primary-1);"></i>
+                    <strong>Important:</strong> Copy this secret now. You won't be able to view it again after closing
+                    this dialog.
+                </div>
+                
+                <div class="alert" style="background: rgba(76, 161, 255, 0.1); border: 1px solid rgba(76, 161, 255, 0.2); color: var(--gray-4); margin-bottom: 1rem;">
+                    <i class="bi bi-shuffle me-2" style="color: var(--primary-4);"></i>
+                    <strong>Lateral Movement:</strong> Do you want to automatically login with this service principal using the new secret?
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-sm" id="lateralMoveYesBtn" 
+                                style="background: var(--primary-4); color: white; margin-right: 0.5rem;">
+                            <i class="bi bi-check-circle me-1"></i> Yes, login automatically
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="lateralMoveNoBtn">
+                            <i class="bi bi-x-circle me-1"></i> No, I'll copy manually
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="secretValue" class="form-label" style="color: var(--primary-1);">Secret Value:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="secretValue" readonly
+                               style="background: rgba(18, 20, 29, 0.8); color: white; border-color: rgba(255, 113, 91, 0.2);">
+                        <button class="btn btn-outline-primary" type="button" id="copySecretBtn">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="secretId" class="form-label" style="color: var(--primary-1);">Secret ID:</label>
+                    <input type="text" class="form-control" id="secretId" readonly 
+                           style="background: rgba(18, 20, 29, 0.8); color: white; border-color: rgba(255, 113, 91, 0.2);">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="startDateTime" class="form-label" style="color: var(--primary-1);">Start Date:</label>
+                        <input type="text" class="form-control" id="startDateTime" readonly
+                               style="background: rgba(18, 20, 29, 0.8); color: white; border-color: rgba(255, 113, 91, 0.2);">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="endDateTime" class="form-label" style="color: var(--primary-1);">End Date:</label>
+                        <input type="text" class="form-control" id="endDateTime" readonly
+                               style="background: rgba(18, 20, 29, 0.8); color: white; border-color: rgba(255, 113, 91, 0.2);">
+                    </div>
+                </div>
+                
+                <!-- Hidden fields for lateral movement -->
+                <input type="hidden" id="secretAppId" value="">
+                <input type="hidden" id="secretTenantId" value="">
+            </div>
+            <div class="modal-footer" style="border-top-color: rgba(255, 113, 91, 0.2);">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="permissionsModal" tabindex="-1" aria-labelledby="permissionsModalLabel" aria-hidden="true" style="margin-top: 80px !important;">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 800px;">
+        <div class="modal-content" style="background: rgba(18, 20, 29, 0.95); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.2);">
+            <style>
+                #permissionsModal {
+                    z-index: 1999 !important;
+                }
+                .modal-backdrop {
+                    z-index: 1998 !important;
+                }
+            </style>
+            <div class="modal-header"
+                style="background: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%); color: white; border-radius: 0 !important;">
+                <h5 class="modal-title" id="permissionsModalLabel">
+                    <i class="bi bi-shield-lock me-2"></i>Add Graph API Permissions
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="permissionsLoading" class="text-center py-4 text-white">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading available permissions...</p>
+                </div>
+                <div id="permissionsContent" class="d-none">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(255, 113, 91, 0.1); border-color: rgba(255, 113, 91, 0.2);">
+                                <i class="bi bi-search" style="color: white;"></i>
+                            </span>
+                            <input type="text" id="permissionSearch" class="form-control" 
+                                   placeholder="Search permissions..."
+                                   style="background: rgba(18, 20, 29, 0.8); color: white; border-color: rgba(255, 113, 91, 0.2);">
+                            <style>
+                                #permissionSearch::placeholder {
+                                    color: rgba(255, 255, 255, 0.5);
+                                }
+                            </style>
+                        </div>
+                    </div>
+                    <div class="alert" style="background: rgba(255, 113, 91, 0.1); border: 1px solid rgba(255, 113, 91, 0.2); color: var(--gray-4);">
+                        <i class="bi bi-info-circle-fill me-2" style="color: var(--primary-1);"></i>
+                        Select one or more permissions to add to this service principal.
+                    </div>
+                    <div id="permissionsList" class="mt-3" style="max-height: 400px; overflow-y: auto;">
+                    </div>
+                </div>
+                <div id="permissionsError" class="d-none">
+                    <div class="alert" style="background: rgba(255, 113, 91, 0.1); border: 1px solid var(--primary-1); color: var(--primary-1);">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="permissionsErrorMessage">Failed to load permissions.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top-color: rgba(255, 113, 91, 0.2);">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="addSelectedPermissionsBtn" class="btn btn-primary" disabled>
+                    Add Selected Permissions
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .object-list {
+        position: relative;
+        margin-top: 20px;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .permission-card {
+        background: rgba(18, 20, 29, 0.8);
+        border: 1px solid rgba(255, 113, 91, 0.1);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+    .permission-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .permission-header {
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .permission-name {
+        color: var(--primary-1);
+        font-weight: bold;
+        font-size: 0.95em;
+    }
+    .permission-body {
+        padding: 10px;
+    }
+    .permission-id {
+        font-family: monospace;
+        background: rgba(255, 113, 91, 0.1);
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        color: var(--primary-3);
+    }
+    .permission-description {
+        margin-top: 5px;
+        color: var(--gray-4);
+        font-size: 0.85em;
+    }
+    .permission-value {
+        font-family: monospace;
+        color: var(--primary-2) !important;
+        font-weight: bold;
+    }
+    .info-section {
+        margin-bottom: 15px;
+    }
+    .info-label {
+        color: var(--primary-1);
+        font-size: 0.8em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+    }
+    .info-value {
+        color: white;
+        font-size: 0.95em;
+        margin-bottom: 10px;
+    }
+    .code-value {
+        font-family: monospace;
+        background: rgba(255, 113, 91, 0.1);
+        padding: 3px 6px;
+        border-radius: 4px;
+        color: var(--primary-3);
+    }
+    .app-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .app-header h4 {
+        margin-bottom: 0;
+    }
+    .badge-container {
+        margin-top: 10px;
+    }
+    .section-title {
+        margin-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.2);
+        padding-bottom: 8px;
+        color: white;
+        font-size: 1.1em;
+    }
+    .box-content {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .permission-checkbox {
+        width: 1.2em;
+        height: 1.2em;
+        background-color: rgba(18, 20, 29, 0.9) !important;
+        border: 1px solid rgba(255, 113, 91, 0.5) !important;
+    }
+    .permission-checkbox:checked {
+        background-color: var(--primary-1) !important;
+        border-color: var(--primary-1) !important;
+    }
+    #permissionsList::-webkit-scrollbar,
+    .permissions-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    #permissionsList::-webkit-scrollbar-track,
+    .permissions-container::-webkit-scrollbar-track {
+        background: rgba(18, 20, 29, 0.5);
+        border-radius: 4px;
+    }
+    #permissionsList::-webkit-scrollbar-thumb,
+    .permissions-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 113, 91, 0.3);
+        border-radius: 4px;
+    }
+    #permissionsList::-webkit-scrollbar-thumb:hover,
+    .permissions-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 113, 91, 0.5);
+    }
+</style>
+
+<div class="object-list">
+    <div class="content-box mb-4" style="height: auto; display: block;">
+        <div class="d-flex justify-content-between align-items-center p-3">
+            <div class="app-header">
+                <a href="{{ url_for('service_principals.list_service_principals') }}" class="btn btn-link text-decoration-none">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <i class="bi bi-key fs-4" style="color: var(--primary-1);"></i>
+                <h4 class="ms-2 text-white">{{ sp.displayName }}</h4>
+                <span class="badge {% if sp.accountEnabled %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ 'Enabled' if sp.accountEnabled else 'Disabled' }}
+                </span>
+            </div>
+            {% set is_managed_identity = (sp.servicePrincipalType == 'ManagedIdentity' or 'WindowsAzureActiveDirectoryManagedIdentity' in (sp.tags or [])) %}
+            <button id="addSecretBtn" class="btn btn-primary"
+                    {% if not access.service_principals.features.manage_apps or is_managed_identity %}disabled{% endif %}
+                    title="{% if not access.service_principals.features.manage_apps %}You need 'manage_apps' permission{% elif is_managed_identity %}Managed Identities cannot have secrets generated{% endif %}">
+                <i class="bi bi-key-fill me-1"></i> Generate New Secret
+            </button>
+        </div>
+        <div class="px-3 pb-2">
+            {{ render_permissions('service_principals', module_permissions) }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="content-box">
+                <div class="p-3 box-content" style="max-height: 460px; overflow-y: auto;">
+                    <h5 class="section-title"><i class="bi bi-info-circle me-2" style="color: var(--primary-1);"></i>
+                        Service Principal Information</h5>
+
+                    <div class="info-section">
+                        <div class="info-label">Display Name</div>
+                        <div class="info-value">{{ sp.displayName }}</div>
+
+                        <div class="info-label">Application ID</div>
+                        <div class="info-value code-value">{{ sp.appId }}</div>
+
+                        <div class="info-label">Object ID</div>
+                        <div class="info-value code-value">{{ sp.id }}</div>
+
+                        <div class="info-label">Type</div>
+                        <div class="info-value">{{ sp.servicePrincipalType }}</div>
+
+                        <div class="info-label">Sign-in Audience</div>
+                        <div class="info-value">{{ sp.signInAudience }}</div>
+
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            <span class="badge {% if sp.accountEnabled %}bg-success{% else %}bg-danger{% endif %}"
+                                style="font-size: 0.9em; padding: 5px 10px;">
+                                {{ 'Enabled' if sp.accountEnabled else 'Disabled' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="content-box">
+                <div class="p-3 box-content">
+                    <h5 class="section-title">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-shield-lock me-2" style="color: var(--primary-1);"></i>
+                                Graph API Permissions
+                            </div>
+                            <button id="addPermissionBtn" class="btn btn-sm btn-primary" 
+                                    {% if not access.service_principals.features.manage_role_assignments %}disabled{% endif %}
+                                    title="{% if not access.service_principals.features.manage_role_assignments %}You need 'manage_role_assignments' permission{% endif %}">
+                                <i class="bi bi-plus-circle me-1"></i> Add Graph API permission
+                            </button>
+                        </div>
+                    </h5>
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background: rgba(255, 113, 91, 0.1); border-color: rgba(255, 113, 91, 0.2);">
+                                <i class="bi bi-search" style="color: white;"></i>
+                            </span>
+                            <input type="text" id="existingPermissionSearch" class="form-control" 
+                                  placeholder="Search existing permissions..."
+                                  style="background: rgba(18, 20, 29, 0.8); color: white; border-color: rgba(255, 113, 91, 0.2);">
+                            <style>
+                                #existingPermissionSearch::placeholder {
+                                    color: rgba(255, 255, 255, 0.5);
+                                }
+                            </style>
+                        </div>
+                    </div>
+
+                    <div class="permissions-container" style="max-height: 340px; overflow-y: auto; padding-right: 10px;">
+                        {% if sp.appRoleAssignments and sp.appRoleAssignments|length > 0 %}
+                        {% for role in sp.appRoleAssignments %}
+                        <div class="permission-card">
+                            <div class="permission-header">
+                                <span class="permission-name">{{ role.permissionName }}</span>
+                            </div>
+                            <div class="permission-body">
+                                <div class="info-label">Permission</div>
+                                <div class="info-value permission-value">{{ role.permissionValue }}</div>
+
+                                <div class="info-label">Resource Name</div>
+                                <div class="info-value">Microsoft Graph</div>
+
+                                <div class="info-label">Permission ID</div>
+                                <div class="permission-id">{{ role.appRoleId }}</div>
+
+                                <div class="info-label">Description</div>
+                                <div class="permission-description">{{ role.permissionDescription }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="alert"
+                            style="background: rgba(255, 113, 91, 0.1); border: 1px solid var(--primary-1); color: var(--primary-1); border-radius: 8px;">
+                            <i class="bi bi-exclamation-circle"></i> This service principal has no Microsoft Graph API
+                            permissions.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addSecretBtn = document.getElementById('addSecretBtn');
+        const addPermissionBtn = document.getElementById('addPermissionBtn');
+        const secretModal = new bootstrap.Modal(document.getElementById('secretModal'));
+        const permissionsModal = new bootstrap.Modal(document.getElementById('permissionsModal'));
+        const secretValue = document.getElementById('secretValue');
+        const secretId = document.getElementById('secretId');
+        const startDateTime = document.getElementById('startDateTime');
+        const endDateTime = document.getElementById('endDateTime');
+        const copySecretBtn = document.getElementById('copySecretBtn');
+        const permissionsLoading = document.getElementById('permissionsLoading');
+        const permissionsContent = document.getElementById('permissionsContent');
+        const permissionsError = document.getElementById('permissionsError');
+        const permissionsErrorMessage = document.getElementById('permissionsErrorMessage');
+        const permissionsList = document.getElementById('permissionsList');
+        const permissionSearch = document.getElementById('permissionSearch');
+        const existingPermissionSearch = document.getElementById('existingPermissionSearch');
+        const permissionCards = document.querySelectorAll('.permissions-container .permission-card');
+        const addSelectedPermissionsBtn = document.getElementById('addSelectedPermissionsBtn');
+
+        // Store available permissions
+        let availablePermissions = [];
+        let selectedPermissions = [];
+
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        // Function to show notification
+        function showNotification(message, type = 'error') {
+            // Use unified notification system
+            ShadowScopeNotifications.show(message, type);
+        }
+
+        // Function to render permission list
+        function renderPermissionsList(permissions) {
+            permissionsList.innerHTML = '';
+            
+            if (permissions.length === 0) {
+                permissionsList.innerHTML = `
+                    <div class="alert" style="background: rgba(255, 113, 91, 0.1); border: 1px solid rgba(255, 113, 91, 0.2); color: var(--gray-4);">
+                        <i class="bi bi-exclamation-circle me-2" style="color: var(--primary-1);"></i> No permissions found matching your search.
+                    </div>
+                `;
+                return;
+            }
+
+            // Create a list with checkboxes
+            const permissionsListEl = document.createElement('div');
+            permissionsListEl.className = 'list-group';
+            
+            permissions.forEach(permission => {
+                const isSelected = selectedPermissions.some(p => p.id === permission.id);
+                const item = document.createElement('div');
+                item.className = 'permission-card mb-2';
+                item.dataset.id = permission.id;
+                item.style.cursor = 'pointer';
+                item.innerHTML = `
+                    <div class="permission-header">
+                        <div class="d-flex align-items-center">
+                            <div class="form-check">
+                                <input class="form-check-input permission-checkbox" type="checkbox" value="${permission.id}" 
+                                       id="permission-${permission.id}" ${isSelected ? 'checked' : ''}>
+                            </div>
+                            <span class="permission-name ms-2">${permission.displayName}</span>
+                        </div>
+                    </div>
+                    <div class="permission-body">
+                        <div class="info-label">Permission Value</div>
+                        <div class="permission-value info-value">${permission.value}</div>
+                        
+                        <div class="info-label">Description</div>
+                        <div class="permission-description">${permission.description}</div>
+                    </div>
+                `;
+                permissionsListEl.appendChild(item);
+                
+                // Make the whole card clickable to toggle the checkbox
+                item.addEventListener('click', function(e) {
+                    // Don't toggle if clicking directly on the checkbox
+                    if (e.target.type !== 'checkbox') {
+                        const checkbox = this.querySelector('.permission-checkbox');
+                        checkbox.checked = !checkbox.checked;
+                        
+                        // Trigger the change event
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+            
+            permissionsList.appendChild(permissionsListEl);
+            
+            // Add event listeners to checkboxes
+            document.querySelectorAll('.permission-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const permissionId = this.value;
+                    const permission = availablePermissions.find(p => p.id === permissionId);
+                    
+                    if (this.checked) {
+                        if (!selectedPermissions.some(p => p.id === permissionId)) {
+                            selectedPermissions.push(permission);
+                        }
+                    } else {
+                        selectedPermissions = selectedPermissions.filter(p => p.id !== permissionId);
+                    }
+                    
+                    // Update the Add button state
+                    addSelectedPermissionsBtn.disabled = selectedPermissions.length === 0;
+                });
+            });
+        }
+
+        // Function to filter permissions
+        function filterPermissions(searchTerm) {
+            if (!searchTerm) {
+                return availablePermissions;
+            }
+            
+            searchTerm = searchTerm.toLowerCase();
+            
+            // Split search term by spaces to allow searching for multiple keywords
+            const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
+            
+            if (searchTerms.length === 0) {
+                return availablePermissions;
+            }
+            
+            return availablePermissions.filter(permission => {
+                const displayName = permission.displayName.toLowerCase();
+                const value = permission.value.toLowerCase();
+                const description = permission.description.toLowerCase();
+                
+                // Check if all search terms are found in at least one of the fields
+                return searchTerms.every(term => 
+                    displayName.includes(term) || 
+                    value.includes(term) || 
+                    description.includes(term)
+                );
+            });
+        }
+
+        // Add event listener to the search input
+        if (permissionSearch) {
+            permissionSearch.addEventListener('input', function() {
+                const filteredPermissions = filterPermissions(this.value);
+                renderPermissionsList(filteredPermissions);
+            });
+        }
+        
+        // Function to filter existing permissions
+        function filterExistingPermissions(searchTerm) {
+            if (!searchTerm) {
+                // Show all permissions if search is empty
+                permissionCards.forEach(card => {
+                    card.style.display = '';
+                });
+                
+                // Show the "no permissions" alert if there are no permissions
+                const noPermissionsAlert = document.querySelector('.permissions-container .alert');
+                if (noPermissionsAlert) {
+                    noPermissionsAlert.style.display = '';
+                }
+                
+                return;
+            }
+            
+            searchTerm = searchTerm.toLowerCase();
+            const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
+            
+            if (searchTerms.length === 0) {
+                permissionCards.forEach(card => {
+                    card.style.display = '';
+                });
+                return;
+            }
+            
+            let matchFound = false;
+            
+            // Hide the "no permissions" alert when searching
+            const noPermissionsAlert = document.querySelector('.permissions-container .alert');
+            if (noPermissionsAlert) {
+                noPermissionsAlert.style.display = 'none';
+            }
+            
+            permissionCards.forEach(card => {
+                const permissionName = card.querySelector('.permission-name')?.textContent.toLowerCase() || '';
+                const permissionValue = card.querySelector('.permission-value')?.textContent.toLowerCase() || '';
+                const permissionDescription = card.querySelector('.permission-description')?.textContent.toLowerCase() || '';
+                
+                const matches = searchTerms.every(term => 
+                    permissionName.includes(term) || 
+                    permissionValue.includes(term) || 
+                    permissionDescription.includes(term)
+                );
+                
+                if (matches) {
+                    card.style.display = '';
+                    matchFound = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // If no matches found, show a message
+            if (!matchFound && noPermissionsAlert) {
+                noPermissionsAlert.style.display = '';
+                noPermissionsAlert.innerHTML = `
+                    <i class="bi bi-exclamation-circle"></i> No permissions found matching "${searchTerm}".
+                `;
+            }
+        }
+        
+        // Add event listener to the existing permissions search input
+        if (existingPermissionSearch) {
+            existingPermissionSearch.addEventListener('input', function() {
+                filterExistingPermissions(this.value);
+            });
+        }
+
+        // Add event listener to the Load Permissions button
+        if (addPermissionBtn && !addPermissionBtn.disabled) {
+            addPermissionBtn.addEventListener('click', async function() {
+                // Reset selection and show modal
+                selectedPermissions = [];
+                addSelectedPermissionsBtn.disabled = true;
+                permissionsModal.show();
+                
+                // Show loading state
+                permissionsLoading.classList.remove('d-none');
+                permissionsContent.classList.add('d-none');
+                permissionsError.classList.add('d-none');
+                
+                try {
+                    // Fetch Microsoft Graph app roles (permissions)
+                    const response = await fetch('/service-principals/graph-permissions', {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.data) {
+                            availablePermissions = data.data;
+                            
+                            // Hide loading and show content
+                            permissionsLoading.classList.add('d-none');
+                            permissionsContent.classList.remove('d-none');
+                            
+                            // Render permissions list
+                            renderPermissionsList(availablePermissions);
+                        } else {
+                            throw new Error(data.message || 'Failed to load permissions');
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to load permissions');
+                    }
+                } catch (error) {
+                    
+                    // Show error message
+                    permissionsLoading.classList.add('d-none');
+                    permissionsError.classList.remove('d-none');
+                    permissionsErrorMessage.textContent = error.message || 'Failed to load permissions';
+                }
+            });
+        }
+
+        // Add event listener to the Add Selected Permissions button
+        if (addSelectedPermissionsBtn) {
+            addSelectedPermissionsBtn.addEventListener('click', async function() {
+                if (selectedPermissions.length === 0) {
+                    return;
+                }
+                
+                // Show loading state
+                addSelectedPermissionsBtn.disabled = true;
+                addSelectedPermissionsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...';
+                
+                try {
+                    // Prepare payload with selected permission IDs
+                    const payload = {
+                        permissionIds: selectedPermissions.map(p => p.id)
+                    };
+                    
+                    // Send request to add permissions
+                    const response = await fetch(`/service-principals/{{ sp.id }}/add-permissions`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    // Reset button state
+                    addSelectedPermissionsBtn.disabled = false;
+                    addSelectedPermissionsBtn.innerHTML = 'Add Selected Permissions';
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Close the modal and show success message
+                            permissionsModal.hide();
+                            showNotification('Permissions added successfully. Reloading page...', 'success');
+                            
+                            // Reload the page after a short delay to reflect changes
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            throw new Error(data.message || 'Failed to add permissions');
+                        }
+                    } else {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to add permissions');
+                    }
+                } catch (error) {
+                    
+                    // Reset button state and show error
+                    addSelectedPermissionsBtn.disabled = false;
+                    addSelectedPermissionsBtn.innerHTML = 'Add Selected Permissions';
+                    showNotification(error.message || 'Failed to add permissions');
+                }
+            });
+        }
+
+        // Check if this is a managed identity and disable button if so
+        const isManagedIdentity = {{ 'true' if (sp.servicePrincipalType == 'ManagedIdentity' or 'WindowsAzureActiveDirectoryManagedIdentity' in (sp.tags or [])) else 'false' }};
+        if (isManagedIdentity) {
+            addSecretBtn.disabled = true;
+            addSecretBtn.title = 'Managed Identities cannot have secrets generated';
+            addSecretBtn.classList.add('disabled');
+        }
+
+        // Add event listener to the button
+        if (addSecretBtn && !addSecretBtn.disabled) {
+            addSecretBtn.addEventListener('click', async function () {
+                try {
+                    // Show loading state
+                    addSecretBtn.disabled = true;
+                    addSecretBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+
+                    const payload = {
+                        passwordCredential: {
+                            displayName: "Generated by ShadowScope"
+                        }
+                    };
+
+                    const response = await fetch(`/service-principals/{{ sp.id }}/addpassword`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload) // Correctly stringified JSON
+                    });
+
+                    // Reset button state
+                    addSecretBtn.disabled = false;
+                    addSecretBtn.innerHTML = '<i class="bi bi-key-fill me-1"></i> Generate New Secret';
+
+                    if (response.ok) {
+                        const data = await response.json();
+
+                        // Populate modal fields
+                        secretValue.value = data.secretText;
+                        secretId.value = data.keyId;
+                        startDateTime.value = formatDate(data.startDateTime);
+                        endDateTime.value = formatDate(data.endDateTime);
+                        
+                        // Store appId and tenantId for lateral movement
+                        document.getElementById('secretAppId').value = data.appId || '';
+                        document.getElementById('secretTenantId').value = data.tenantId || '';
+
+                        // Show the modal
+                        secretModal.show();
+                    } else {
+                        const errorData = await response.json();
+
+                        // Show a more user-friendly and visible error message
+                        const errorMessage = document.createElement('div');
+                        errorMessage.className = 'alert alert-danger mt-3';
+                        errorMessage.style.position = 'fixed';
+                        errorMessage.style.top = '20px';
+                        errorMessage.style.right = '20px';
+                        errorMessage.style.zIndex = '9999';
+                        errorMessage.style.maxWidth = '400px';
+
+                        if (errorData.code === 'CannotUpdateLockedServicePrincipalProperty' ||
+                            errorData.message?.includes('CannotUpdateLockedServicePrincipalProperty')) {
+                            errorMessage.innerHTML = `
+                                <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Cannot Add Secret</h5>
+                                <p>This service principal doesn't support adding secrets. This is usually because:</p>
+                                <ul>
+                                    <li>It's a Microsoft first-party application</li>
+                                    <li>It's synchronized from on-premises</li>
+                                    <li>Password credential management is disabled</li>
+                                </ul>
+                            `;
+                        } else {
+                            errorMessage.innerHTML = `
+                                <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h5>
+                                <p>${errorData.message || 'Failed to generate secret'}</p>
+                            `;
+                        }
+
+                        // Add a close button
+                        const closeButton = document.createElement('button');
+                        closeButton.type = 'button';
+                        closeButton.className = 'btn-close';
+                        closeButton.setAttribute('aria-label', 'Close');
+                        closeButton.style.position = 'absolute';
+                        closeButton.style.top = '10px';
+                        closeButton.style.right = '10px';
+                        closeButton.onclick = function () {
+                            document.body.removeChild(errorMessage);
+                        };
+
+                        errorMessage.appendChild(closeButton);
+                        document.body.appendChild(errorMessage);
+
+                        // Auto-remove after 10 seconds
+                        setTimeout(() => {
+                            if (document.body.contains(errorMessage)) {
+                                document.body.removeChild(errorMessage);
+                            }
+                        }, 10000);
+                    }
+                } catch (error) {
+
+                    // Create error message with same style
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'alert alert-danger mt-3';
+                    errorMessage.style.position = 'fixed';
+                    errorMessage.style.top = '20px';
+                    errorMessage.style.right = '20px';
+                    errorMessage.style.zIndex = '9999';
+                    errorMessage.style.maxWidth = '400px';
+                    errorMessage.innerHTML = `
+                        <h5><i class="bi bi-exclamation-triangle-fill me-2"></i>Error</h5>
+                        <p>An error occurred while generating the secret. Please try again.</p>
+                    `;
+
+                    // Add close button
+                    const closeButton = document.createElement('button');
+                    closeButton.type = 'button';
+                    closeButton.className = 'btn-close';
+                    closeButton.setAttribute('aria-label', 'Close');
+                    closeButton.style.position = 'absolute';
+                    closeButton.style.top = '10px';
+                    closeButton.style.right = '10px';
+                    closeButton.onclick = function () {
+                        document.body.removeChild(errorMessage);
+                    };
+
+                    errorMessage.appendChild(closeButton);
+                    document.body.appendChild(errorMessage);
+
+                    // Auto-remove after 10 seconds
+                    setTimeout(() => {
+                        if (document.body.contains(errorMessage)) {
+                            document.body.removeChild(errorMessage);
+                        }
+                    }, 10000);
+
+                    // Reset button state
+                    addSecretBtn.disabled = false;
+                    addSecretBtn.innerHTML = '<i class="bi bi-key-fill me-1"></i> Generate New Secret';
+                }
+            });
+        }
+
+        // Copy secret to clipboard
+        if (copySecretBtn) {
+            copySecretBtn.addEventListener('click', function () {
+                secretValue.select();
+                document.execCommand('copy');
+
+                // Show copied feedback
+                const originalText = copySecretBtn.innerHTML;
+                copySecretBtn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                setTimeout(() => {
+                    copySecretBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        
+        // Lateral movement - Yes button
+        const lateralMoveYesBtn = document.getElementById('lateralMoveYesBtn');
+        if (lateralMoveYesBtn) {
+            lateralMoveYesBtn.addEventListener('click', async function () {
+                try {
+                    const appId = document.getElementById('secretAppId').value;
+                    const tenantId = document.getElementById('secretTenantId').value;
+                    const clientSecret = document.getElementById('secretValue').value;
+                    
+                    if (!appId || !tenantId || !clientSecret) {
+                        alert('Missing required credentials for lateral movement');
+                        return;
+                    }
+                    
+                    // Disable button and show loading
+                    lateralMoveYesBtn.disabled = true;
+                    lateralMoveYesBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                    
+                    const response = await fetch('/service-principals/lateral-move', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            client_id: appId,
+                            client_secret: clientSecret,
+                            tenant_id: tenantId
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Close modal
+                        secretModal.hide();
+                        
+                        // Show success message with app info
+                        if (window.ShadowScopeNotifications) {
+                            window.ShadowScopeNotifications.show(
+                                `Lateral movement successful! Now authenticated as: ${result.app_name}`,
+                                'success',
+                                2000
+                            );
+                        }
+                        
+                        // Redirect to dashboard
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 800);
+                    } else {
+                        alert('Error: ' + result.message);
+                        lateralMoveYesBtn.disabled = false;
+                        lateralMoveYesBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Yes, login automatically';
+                    }
+                } catch (error) {
+                    alert('Error during lateral movement: ' + error.message);
+                    lateralMoveYesBtn.disabled = false;
+                    lateralMoveYesBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Yes, login automatically';
+                }
+            });
+        }
+        
+        // Lateral movement - No button
+        const lateralMoveNoBtn = document.getElementById('lateralMoveNoBtn');
+        if (lateralMoveNoBtn) {
+            lateralMoveNoBtn.addEventListener('click', function () {
+                // Just close the lateral movement alert visually
+                const lateralAlert = lateralMoveNoBtn.closest('.alert');
+                if (lateralAlert) {
+                    lateralAlert.style.display = 'none';
+                }
+                
+                // Show feedback
+                if (window.ShadowScopeNotifications) {
+                    window.ShadowScopeNotifications.show(
+                        'Make sure to copy the secret before closing this window',
+                        'info',
+                        3000
+                    );
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,390 @@
+{% extends "dashboard.html" %}
+{% from 'entraID/permission_info.html' import render_permissions %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .table-standard {
+        font-size: 0.85rem;
+    }
+    .table-standard td {
+        padding: 0.4rem 0.6rem;
+        height: 36px;
+        line-height: 1.2;
+    }
+    .table-standard th {
+        padding: 0.5rem 0.6rem;
+        height: 38px;
+        font-size: 0.75rem;
+    }
+    #data-table.table {
+        --bs-table-bg: rgba(18, 20, 29, 0.8) !important;
+        --bs-table-color: var(--gray-4) !important;
+        --bs-table-border-color: rgba(255, 113, 91, 0.1) !important;
+    }
+    .table {
+        --bs-table-hover-bg: rgba(255, 113, 91, 0.05);
+        margin-bottom: 0;
+        background: rgba(18, 20, 29, 0.8);
+        color: var(--gray-4);
+        table-layout: fixed;
+        width: 100%;
+    }
+    .table-responsive {
+        position: relative;
+        overflow-y: auto;
+        max-height: 600px;
+        min-height: 400px;
+    }
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .table th {
+        position: sticky;
+        top: 0;
+        background: rgba(18, 20, 29, 0.9);
+        z-index: 1;
+        color: var(--primary-1);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 0.5rem 0.6rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.2);
+        height: 38px;
+    }
+    .table td {
+        padding: 0.4rem 0.6rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+        height: 36px;
+    }
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .btn i {
+        font-size: 1rem;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .btn-primary:disabled {
+        background: transparent;
+        border: 1px solid var(--primary-1);
+        color: var(--primary-1);
+        transform: none;
+        box-shadow: none;
+    }
+    .btn-outline-primary {
+        color: var(--primary-1);
+        border-color: var(--primary-1);
+        background-color: transparent;
+    }
+    .btn-outline-primary:hover {
+        background: var(--primary-1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(255, 113, 91, 0.3);
+    }
+    .action-button {
+        height: 24px;
+        padding: 0 0.5rem;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    .action-button i {
+        font-size: 0.75rem;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .input-group {
+        border-radius: 6px;
+    }
+    .input-group .form-control {
+        padding: 0.4rem 0.75rem;
+    }
+    .search-control {
+        height: 32px;
+        padding: 0.25rem 0.5rem;
+    }
+    #search-items::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .info-panel {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .text-truncate {
+        max-width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline;
+    }
+    .modal-content {
+        background: rgba(18, 20, 29, 0.95);
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        color: var(--white);
+        border-radius: 12px;
+    }
+    .modal-header {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        color: white;
+        border-bottom: none;
+    }
+    .modal-footer {
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box mb-2 info-panel">
+        <div class="d-flex align-items-center p-2">
+            <a href="{{ url_for('teams.list_teams') }}" class="btn btn-link text-decoration-none me-2 p-0">
+                <i class="bi bi-arrow-left" style="color: var(--primary-1);"></i>
+            </a>
+            <h5 class="mb-0 ps-2" style="font-size: 0.95rem;">
+                <i class="bi bi-microsoft-teams" style="color: var(--primary-1);"></i>
+                <span class="text-white">{{ team.displayName }}: Channels</span>
+            </h5>
+        </div>
+        <div class="ps-2 pe-2 pb-1" style="font-size: 0.8rem;">
+            {{ render_permissions('teams', module_permissions) }}
+        </div>
+    </div>
+
+    <div class="content-box table-box">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0" style="background: var(--gray-1)">
+                <div class="p-2 border-bottom" style="background: rgba(18, 20, 29, 0.8); border-bottom: 1px solid rgba(255, 113, 91, 0.1);">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                            <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                        </span>
+                        <input type="text" class="form-control border-0 bg-transparent py-1" 
+                               id="search-items" placeholder="Search channels..."
+                               style="
+                                    background-color: rgba(18, 20, 29, 0.6) !important;
+                                    color: var(--gray-4);
+                                    border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                    height: 32px;
+                               ">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table" class="table table-hover table-standard mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 20%">Channel Name</th>
+                                <th style="width: 35%">Description</th>
+                                <th style="width: 15%">Membership</th>
+                                <th style="width: 30%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for channel in channels %}
+                            <tr class="item-row" data-item-id="{{ channel.id }}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-hash me-2" style="color: var(--primary-1);"></i>
+                                        <div class="text-truncate text-white">{{ channel.displayName }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="text-truncate">{{ channel.description }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-center">
+                                        <span class="badge bg-primary">{{ channel.membershipType }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if access.teams.features.list_channel_members %}
+                                        <a href="{{ url_for('teams.edit_channel_members', team_id=team.id, channel_id=channel.id) }}" 
+                                           class="btn btn-sm btn-primary py-0 px-2"
+                                           style="font-size: 0.75rem; height: 24px;">
+                                            <i class="bi bi-people" style="font-size: 0.75rem"></i> Members
+                                        </a>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-primary py-0 px-2" 
+                                                style="font-size: 0.75rem; height: 24px;" 
+                                                disabled title="Insufficient permissions">
+                                            <i class="bi bi-people" style="font-size: 0.75rem"></i> Members
+                                        </button>
+                                        {% endif %}
+
+                                        {% if access.teams.features.read_channel_messages %}
+                                        <a href="{{ url_for('teams.list_channel_messages', team_id=team.id, channel_id=channel.id) }}" 
+                                           class="btn btn-sm btn-primary py-0 px-2"
+                                           style="font-size: 0.75rem; height: 24px;">
+                                            <i class="bi bi-eye" style="font-size: 0.75rem"></i> Messages
+                                        </a>
+                                        {% else %}
+                                        <button class="btn btn-sm btn-primary py-0 px-2" 
+                                                style="font-size: 0.75rem; height: 24px;" 
+                                                disabled title="Insufficient permissions">
+                                            <i class="bi bi-eye" style="font-size: 0.75rem"></i> Messages
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="alert alert-info mb-0">
+                                        No channels found.
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="membersModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Channel Members</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 text-white" id="membersChannelName"></h6>
+                    <div class="spinner-border spinner-border-sm text-primary d-none" role="status" aria-hidden="true"></div>
+                </div>
+                <div class="table-responsive" style="max-height: calc(100vh - 250px); overflow-y: auto;">
+                    <table class="table table-hover mb-0 table-standard">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">Name</th>
+                                <th style="width: 50%">Email</th>
+                                <th style="width: 20%">Role</th>
+                            </tr>
+                        </thead>
+                        <tbody id="membersList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize the Bootstrap modal
+    let membersModal;
+    document.addEventListener('DOMContentLoaded', function() {
+        membersModal = new bootstrap.Modal(document.getElementById('membersModal'));
+        
+        // Add event listeners to buttons
+        document.querySelectorAll('.see-members').forEach(button => {
+            button.addEventListener('click', () => {
+                const teamId = button.dataset.teamId;
+                const channelId = button.dataset.channelId;
+                window.location.href = `/teams/${teamId}/channels/${channelId}/members`;
+            });
+        });
+    });
+
+    // Search functionality
+    document.getElementById('search-items').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        
+        document.querySelectorAll('.item-row').forEach(row => {
+            const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+            const description = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const membership = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            
+            if (name.includes(searchTerm) || description.includes(searchTerm) || membership.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Inicializar tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
+{% endblock %}

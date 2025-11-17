@@ -1,0 +1,377 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 0;
+        overflow: hidden;
+        border: none;
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        padding: 0;
+        background: var(--gray-1);
+    }
+    .table-standard {
+        font-size: 0.85rem;
+    }
+    .table-standard td {
+        padding: 0.4rem 0.6rem;
+        height: 36px;
+        line-height: 1.2;
+    }
+    .table-standard th {
+        padding: 0.5rem 0.6rem;
+        height: 38px;
+        font-size: 0.75rem;
+    }
+    .table {
+        --bs-table-hover-bg: rgba(255, 113, 91, 0.05);
+        --bs-table-bg: rgba(18, 20, 29, 0.8) !important;
+        --bs-table-color: var(--gray-4) !important;
+        --bs-table-border-color: rgba(255, 113, 91, 0.1) !important;
+        margin-bottom: 0;
+        background: rgba(18, 20, 29, 0.8) !important;
+        color: var(--gray-4);
+        table-layout: auto;
+        width: 100%;
+        border-color: transparent !important;
+    }
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .table tbody tr {
+        background-color: rgba(18, 20, 29, 0.8) !important;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(255, 113, 91, 0.05) !important;
+    }
+    .table-responsive {
+        position: relative;
+        overflow-y: auto;
+        max-height: 600px;
+        min-height: 400px;
+        border: none !important;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .subscription-info {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--gray-4);
+        margin-top: 0.25rem;
+    }
+    code {
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--primary-1);
+        padding: 0.2rem 0.3rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+    }
+    .toggle-details {
+        color: var(--primary-1);
+        border: none;
+        background: transparent;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+    }
+    .toggle-details:hover {
+        color: var(--primary-2);
+    }
+    .toggle-details i {
+        transition: transform 0.2s ease;
+    }
+    .toggle-details.active i {
+        transform: rotate(90deg);
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .details-content {
+        background: rgba(18, 20, 29, 0.95);
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .json-viewer {
+        background: rgba(18, 20, 29, 0.95);
+        color: var(--gray-4);
+        font-size: 0.75rem;
+        margin: 0;
+        padding: 0;
+        border: none;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .table td:nth-child(4) {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    .table td:nth-child(5) {
+        white-space: nowrap;
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box mb-2 info-panel">
+        <div class="d-flex justify-content-between align-items-center p-2">
+            <h5 class="mb-0 ps-2" style="font-size: 0.95rem;">
+                <i class="bi bi-folder-fill me-2" style="color: var(--primary-1);"></i> Resource Groups
+            </h5>
+            <div class="d-flex gap-2 align-items-center">
+                {% if cache_time %}
+                <span class="text-muted" style="font-size: 0.75rem;">
+                    <i class="bi bi-clock-history me-1"></i> Cached: {{ cache_time }}
+                </span>
+                {% endif %}
+                <a href="{{ url_for('resource_groups.refresh_resource_groups') }}" class="btn btn-outline-primary py-1 px-2"
+                    style="font-size: 0.8rem; height: 28px;"
+                    title="Refresh resource groups data from API">
+                    <i class="bi bi-arrow-repeat"></i> Refresh
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-box table-box">
+        <div class="card">
+            <div class="card-body">
+                <div class="p-2 border-bottom d-flex justify-content-between align-items-center" style="background: rgba(18, 20, 29, 0.8); border-bottom: 1px solid rgba(255, 113, 91, 0.1);">
+                    <div class="input-group" style="flex: 1; max-width: 400px;">
+                        <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                            <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                        </span>
+                        <input type="text" class="form-control border-0 bg-transparent py-1" id="rgSearch" 
+                            placeholder="Search resource groups..." 
+                            style="
+                                background-color: rgba(18, 20, 29, 0.6) !important;
+                                color: var(--gray-4);
+                                border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                height: 32px;
+                            ">
+                    </div>
+                    <button id="export-csv" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 0.75rem; height: 24px;">
+                        <i class="bi bi-download" style="font-size: 0.75rem"></i> Export CSV
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-standard" id="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px"></th>
+                                <th style="min-width: 200px; width: auto;">Name</th>
+                                <th style="min-width: 200px; width: auto;">Subscription</th>
+                                <th style="min-width: 200px; width: auto;">Roles Assigned</th>
+                                <th style="width: 150px; min-width: 130px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if resource_groups %}
+                                {% for rg in resource_groups %}
+                                <tr class="item-row" data-item-id="{{ rg.name }}">
+                                    <td>
+                                        <button class="btn btn-sm btn-link p-0 toggle-details">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-folder-fill me-2" aria-hidden="true" style="color: var(--primary-1);"></i>
+                                        <span class="text-white">{{ rg.name }}</span>
+                                    </td>
+                                    <td>
+                                        {{ rg.subscriptionName }}
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center;">
+                                            {% if rg.roles %}
+                                                {% for role in rg.roles %}
+                                                <span class="badge" style="background: rgba(255, 113, 91, 0.2); color: var(--primary-1);" title="{{ role.description }}">
+                                                    {{ role.name }}
+                                                </span>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if rg.inheritedRoles %}
+                                                {% for role in rg.inheritedRoles %}
+                                                <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;" title="Inherited from Subscription: {{ role.description }}">
+                                                    {{ role.name }} <small class="ms-1">(Inherited)</small>
+                                                </span>
+                                                {% endfor %}
+                                            {% endif %}
+                                            {% if not rg.roles and not rg.inheritedRoles %}
+                                                <span class="text-muted">No roles assigned</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-nowrap gap-2">
+                                            <a href="{{ url_for('resource_groups.resource_group_details', subscription_id=rg.subscriptionId, resource_group_name=rg.name) }}" 
+                                               class="btn btn-sm btn-primary py-0 px-2"
+                                               style="font-size: 0.75rem; height: 24px;">
+                                                <i class="bi bi-eye" style="font-size: 0.75rem"></i> View Details
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="details-row d-none" data-item-id="{{ rg.name }}">
+                                    <td colspan="5" class="p-0">
+                                        <div class="details-content p-3">
+                                            <pre class="json-viewer">{{ rg|tojson(indent=2) }}</pre>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            No resource groups found where this Service Principal has assigned roles.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle details
+    document.querySelectorAll('.toggle-details').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('.item-row');
+            const detailsRow = document.querySelector(`.details-row[data-item-id="${row.dataset.itemId}"]`);
+            const icon = this.querySelector('i');
+            
+            if (detailsRow.classList.contains('d-none')) {
+                detailsRow.classList.remove('d-none');
+                this.classList.add('active');
+                icon.style.transform = 'rotate(90deg)';
+            } else {
+                detailsRow.classList.add('d-none');
+                this.classList.remove('active');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        });
+    });
+
+    // Search functionality
+    document.getElementById('rgSearch').addEventListener('input', function() {
+        const filter = this.value.toUpperCase();
+        const rows = document.querySelectorAll('.item-row');
+        
+        rows.forEach(row => {
+            const name = row.querySelector('td:nth-child(2)').textContent.toUpperCase();
+            const subscription = row.querySelector('td:nth-child(3)').textContent.toUpperCase();
+            const roles = row.querySelector('td:nth-child(4)').textContent.toUpperCase();
+            
+            if (name.includes(filter) || subscription.includes(filter) || roles.includes(filter)) {
+                row.style.display = '';
+                const detailsRow = document.querySelector(`.details-row[data-item-id="${row.dataset.itemId}"]`);
+                if (detailsRow) {
+                    detailsRow.style.display = '';
+                }
+            } else {
+                row.style.display = 'none';
+                const detailsRow = document.querySelector(`.details-row[data-item-id="${row.dataset.itemId}"]`);
+                if (detailsRow) {
+                    detailsRow.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    // Export to CSV
+    function exportToCSV() {
+        const table = document.getElementById('data-table');
+        const rows = table.querySelectorAll('.item-row');
+        let csvContent = '';
+
+        // Headers
+        csvContent += 'Name,Subscription,Roles Assigned\n';
+
+        // Data
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const name = row.querySelector('td:nth-child(2)').textContent.trim();
+                const subscription = row.querySelector('td:nth-child(3)').textContent.trim();
+                const roles = row.querySelector('td:nth-child(4)').textContent.trim();
+                
+                const values = [name, subscription, roles].map(value => {
+                    if (value.includes(',') || value.includes('"')) {
+                        return `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value;
+                });
+                csvContent += values.join(',') + '\n';
+            }
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'ResourceGroups.csv';
+        link.click();
+    }
+    
+    // Event listeners
+    document.getElementById('export-csv').addEventListener('click', exportToCSV);
+</script>
+{% endblock %}

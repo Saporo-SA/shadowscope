@@ -1,0 +1,449 @@
+{% extends "dashboard.html" %}
+{% from 'entraID/permission_info.html' import render_permissions %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .table-standard {
+        font-size: 0.85rem;
+    }
+    .table-standard td {
+        padding: 0.4rem 0.6rem;
+        height: 36px;
+        line-height: 1.2;
+    }
+    .table-standard th {
+        padding: 0.5rem 0.6rem;
+        height: 38px;
+        font-size: 0.75rem;
+    }
+    #data-table.table {
+        --bs-table-bg: rgba(18, 20, 29, 0.8) !important;
+        --bs-table-color: var(--gray-4) !important;
+        --bs-table-border-color: rgba(255, 113, 91, 0.1) !important;
+    }
+    .table {
+        --bs-table-hover-bg: rgba(255, 113, 91, 0.05);
+        margin-bottom: 0;
+        background: rgba(18, 20, 29, 0.8);
+        color: var(--gray-4);
+        table-layout: fixed;
+        width: 100%;
+    }
+    .table-responsive {
+        position: relative;
+        overflow-y: auto;
+        max-height: 600px;
+        min-height: 400px;
+    }
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .table th {
+        position: sticky;
+        top: 0;
+        background: rgba(18, 20, 29, 0.9);
+        z-index: 1;
+        color: var(--primary-1);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 0.5rem 0.6rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.2);
+        height: 38px;
+    }
+    .table td {
+        padding: 0.4rem 0.6rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+        height: 36px;
+    }
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .btn i {
+        font-size: 1rem;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .btn-primary:disabled {
+        background: transparent;
+        border: 1px solid var(--primary-1);
+        color: var(--primary-1);
+        transform: none;
+        box-shadow: none;
+    }
+    .btn-outline-primary {
+        color: var(--primary-1);
+        border-color: var(--primary-1);
+        background-color: transparent;
+    }
+    .btn-outline-primary:hover {
+        background: var(--primary-1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(255, 113, 91, 0.3);
+    }
+    .action-button {
+        height: 24px;
+        padding: 0 0.5rem;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    .action-button i {
+        font-size: 0.75rem;
+    }
+    .details-content {
+        background: rgba(18, 20, 29, 0.8);
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+        overflow: visible;
+    }
+    .toggle-details {
+        color: var(--primary-1);
+        transition: all 0.2s ease;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        background: transparent;
+        border: none;
+    }
+    .list-id {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary-1);
+        padding: 0.15rem 0.3rem;
+        border-radius: 3px;
+        font-size: 0.8em;
+        font-family: var(--bs-font-monospace);
+    }
+    .json-viewer {
+        background: transparent;
+        border: none;
+        color: var(--gray-4);
+        font-size: 0.8rem;
+        overflow-y: visible;
+        padding: 0.5rem;
+        margin: 0;
+        max-height: none;
+        white-space: pre-wrap;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .input-group {
+        border-radius: 6px;
+    }
+    .input-group .form-control {
+        padding: 0.4rem 0.75rem;
+    }
+    .search-control {
+        height: 32px;
+        padding: 0.25rem 0.5rem;
+    }
+    #search-items::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .info-panel {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .modal-content {
+        background: rgba(18, 20, 29, 0.95);
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        color: var(--white);
+        border-radius: 12px;
+    }
+    .modal-header {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        color: white;
+        border-bottom: none;
+    }
+    .modal-footer {
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .alert-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        border-color: rgba(255, 193, 7, 0.2);
+        color: #ffdc86;
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box mb-2 info-panel">
+        <div class="d-flex justify-content-between align-items-center p-2">
+            <h5 class="mb-0 ps-2" style="font-size: 0.95rem;">
+                <i class="bi bi-diagram-3" style="color: var(--primary-1);"></i> Administrative Units
+            </h5>
+            <div class="d-flex gap-2 align-items-center">
+                {% if cache_time %}
+                <small style="color: var(--primary-3); font-weight: 500; font-size: 0.75rem;">
+                    <i class="bi bi-clock-history me-1"></i> Cached: {{ cache_time }}
+                </small>
+                {% endif %}
+                <a href="{{ url_for('admin_units.refresh_administrative_units') }}" class="btn btn-outline-primary py-1 px-2"
+                    style="font-size: 0.8rem; height: 28px;" {% if not access.admin_units.base %}disabled{% endif %}
+                    title="{% if not access.admin_units.base %}You need AdministrativeUnit.Read.All permission{% else %}Refresh administrative units data from API{% endif %}">
+                    <i class="bi bi-arrow-repeat"></i> Refresh
+                </a>
+                <button id="export-csv" class="btn btn-primary py-1 px-2" style="font-size: 0.8rem; height: 28px;">
+                    <i class="bi bi-download"></i> Export CSV
+                </button>
+            </div>
+        </div>
+
+        <div class="ps-2 pe-2 pb-1" style="font-size: 0.8rem;">
+            {{ render_permissions('admin_units', module_permissions) }}
+        </div>
+    </div>
+
+    <div class="content-box table-box">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0" style="background: var(--gray-1)">
+                <div class="p-2 border-bottom"
+                    style="background: rgba(18, 20, 29, 0.8); border-bottom: 1px solid rgba(255, 113, 91, 0.1);">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                            <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                        </span>
+                        <input type="text" class="form-control border-0 bg-transparent py-1" id="search-items"
+                            placeholder="Search administrative units..." style="
+                                    background-color: rgba(18, 20, 29, 0.6) !important;
+                                    color: var(--gray-4);
+                                    border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                    height: 32px;
+                               ">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="data-table" class="table table-hover table-standard mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px"></th>
+                                <th>Display Name</th>
+                                <th>ID</th>
+                                <th>Restricted Management</th>
+                                <th>Membership Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for unit in items %}
+                            <tr class="item-row" data-item-id="{{ unit.id }}">
+                                <td>
+                                    <button class="btn btn-sm btn-link p-0 toggle-details">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <i class="bi bi-diagram-3 me-2" style="color: var(--primary-1);"></i>
+                                    <span class="text-white">{{ unit.displayName }}</span>
+                                </td>
+                                <td><code class="list-id">{{ unit.id }}</code></td>
+                                <td>
+                                    {% if unit.restrictedManagement %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-lock-fill"></i> Restricted
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-unlock"></i> Unrestricted
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ unit.membershipType if unit.membershipType else 'Standard' }}
+                                    </span>
+                                </td>
+                                {% if access.admin_units.features.manage_members %}
+                                <td>
+                                    {% if not unit.restrictedManagement %}
+                                    <a href="{{ url_for('admin_units.edit_administrative_unit_membership', unit_id=unit.id) }}"
+                                        class="btn btn-sm btn-primary py-0 px-2"
+                                        style="font-size: 0.75rem; height: 24px;">
+                                        <i class="bi bi-people" style="font-size: 0.75rem"></i> Edit Members
+                                    </a>
+                                    {% else %}
+                                    <a href="{{ url_for('admin_units.edit_administrative_unit_membership', unit_id=unit.id) }}"
+                                        class="btn btn-sm btn-primary py-0 px-2"
+                                        style="font-size: 0.75rem; height: 24px;" disabled data-bs-toggle="tooltip"
+                                        title="This administrative unit has restricted management. You can view members but not edit them.">
+                                        <i class="bi bi-eye" style="font-size: 0.75rem"></i> View Members
+                                    </a>
+                                    {% endif %}
+                                </td>
+                                {% else %}
+                                <td>
+                                    <a href="{{ url_for('admin_units.edit_administrative_unit_membership', unit_id=unit.id) }}"
+                                        class="btn btn-sm btn-primary py-0 px-2"
+                                        style="font-size: 0.75rem; height: 24px;" disabled data-bs-toggle="tooltip"
+                                        title="You don't have permission to manage members in this administrative unit.">
+                                        <i class="bi bi-eye" style="font-size: 0.75rem"></i> View Members
+                                </td>
+                                {% endif %}
+                            </tr>
+                            <tr class="details-row d-none" data-item-id="{{ unit.id }}">
+                                <td colspan="{% if 'AdministrativeUnit.ReadWrite.All' in app_info.permissions %}6{% else %}5{% endif %}"
+                                    class="p-0">
+                                    <div class="details-content p-3">
+                                        <pre class="json-viewer">{{ unit|tojson(indent=2) }}</pre>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle detail view
+    document.querySelectorAll('.toggle-details').forEach(button => {
+        button.addEventListener('click', () => {
+            const itemId = button.closest('tr').dataset.itemId;
+            const detailsRow = document.querySelector(`.details-row[data-item-id="${itemId}"]`);
+            const icon = button.querySelector('i');
+
+            if (detailsRow.classList.contains('d-none')) {
+                icon.classList.remove('bi-chevron-right');
+                icon.classList.add('bi-chevron-down');
+            } else {
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-right');
+            }
+
+            detailsRow.classList.toggle('d-none');
+        });
+    });
+
+    // Funcionalidade de pesquisa
+    document.getElementById('search-items').addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+
+        document.querySelectorAll('.item-row').forEach(row => {
+            const displayName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const id = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+            const detailsRow = document.querySelector(`.details-row[data-item-id="${row.dataset.itemId}"]`);
+
+            if (displayName.includes(searchTerm) || id.includes(searchTerm)) {
+                row.style.display = '';
+                if (detailsRow) detailsRow.style.display = '';
+            } else {
+                row.style.display = 'none';
+                if (detailsRow) detailsRow.style.display = 'none';
+            }
+        });
+    });
+
+    // Exportar para CSV
+    function exportToCSV() {
+        const table = document.getElementById('data-table');
+        const rows = table.querySelectorAll('.item-row');
+        let csvContent = '';
+
+        // Headers
+        csvContent += 'Display Name,ID,Restricted Management,Membership Type\n';
+
+        // Data
+        rows.forEach(row => {
+            if (row.style.display !== 'none') {
+                const cells = Array.from(row.querySelectorAll('td')).slice(1, 5);
+                const values = cells.map(cell => {
+                    let value = cell.textContent.trim();
+                    if (value.includes(',') || value.includes('"')) {
+                        value = `"${value.replace(/"/g, '""')}"`;
+                    }
+                    return value;
+                });
+                csvContent += values.join(',') + '\n';
+            }
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'AdministrativeUnits.csv';
+        link.click();
+    }
+
+    // Event listeners
+    document.getElementById('export-csv').addEventListener('click', exportToCSV);
+
+    // Inicializar tooltips
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
+{% endblock %}

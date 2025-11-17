@@ -1,0 +1,802 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 0;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+        overflow: hidden;
+    }
+    .card {
+        background: rgba(18, 20, 29, 0.8);
+        border-radius: 0;
+        overflow: hidden;
+        border: 1px solid;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%) 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    .card-header {
+        background: rgba(18, 20, 29, 0.9);
+        color: var(--gray-light);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+        font-weight: 500;
+        padding: 0.5rem 0.75rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+    .card-header i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .card-body {
+        padding: 0.75rem;
+        background: rgba(18, 20, 29, 0.5);
+    }
+    .detail-item {
+        margin-bottom: 0.75rem;
+    }
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+    .detail-label {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--primary-1);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .detail-value {
+        color: var(--white);
+        font-size: 0.85rem;
+        background: rgba(18, 20, 29, 0.4);
+        padding: 0.35rem 0.5rem;
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        min-height: 32px;
+        display: flex;
+        align-items: center;
+        line-height: 1.2;
+        box-sizing: border-box;
+        height: auto;
+    }
+    .detail-value code {
+        line-height: 1;
+    }
+    .resource-card {
+        border: 1px solid;
+        border-image: linear-gradient(45deg, rgba(255, 113, 91, 0.3), rgba(75, 49, 179, 0.3)) 1;
+        border-radius: 0;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background-color: rgba(18, 20, 29, 0.4);
+        transition: all 0.2s ease;
+    }
+    .resource-card:last-child {
+        margin-bottom: 0;
+    }
+    .resource-card:hover {
+        background-color: rgba(255, 113, 91, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .resource-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--white);
+        font-size: 0.85rem;
+    }
+    .resource-title i {
+        color: var(--primary-1);
+        font-size: 0.8rem;
+    }
+    .resource-info {
+        margin-top: 0;
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        grid-gap: 0.25rem;
+        align-items: center;
+    }
+    .resource-info-label {
+        color: var(--gray-4);
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    .resource-info-value {
+        color: var(--white);
+        font-size: 0.7rem;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    .back-btn {
+        color: var(--primary-1);
+        background: transparent;
+        border: none;
+        transition: all 0.2s ease;
+        padding: 0;
+        margin-right: 0.75rem;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+    .back-btn:hover {
+        transform: translateX(-3px);
+        color: var(--white);
+    }
+    .page-title {
+        font-size: 1.1rem;
+        color: var(--white);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+    }
+    .page-title i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+    }
+    .page-subtitle {
+        color: var(--gray-4);
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+    }
+    code {
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--primary-1);
+        padding: 0.2rem 0.3rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-family: 'Fira Code', monospace;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .resources-container {
+        max-height: 500px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 5px;
+    }
+    .resources-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    .resources-container::-webkit-scrollbar-track {
+        background: rgba(18, 20, 29, 0.3);
+        border-radius: 3px;
+    }
+    .resources-container::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--primary-1), var(--primary-5));
+        border-radius: 3px;
+    }
+    table.data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    table.data-table th {
+        background: rgba(18, 20, 29, 0.7);
+        color: var(--gray-4);
+        font-weight: 500;
+        text-align: left;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    table.data-table td {
+        padding: 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--white);
+    }
+    table.data-table tr:hover {
+        background-color: rgba(255, 113, 91, 0.05);
+    }
+    .inheritance-info i {
+        color: var(--white);
+        margin-right: 0.5rem;
+    }
+    .hierarchy-diagram-container {
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .inheritance-info mt-2 {
+        margin-top: 1rem;
+    }
+    .hierarchy-diagram {
+        background: rgba(15, 20, 35, 0.9);
+        border: 1px solid rgba(40, 45, 75, 0.5);
+        border-radius: 6px;
+        padding: 2rem 1.5rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    .hierarchy-diagram.collapsed {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin: 0;
+        border: none;
+        opacity: 0;
+    }
+    .hierarchy-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    .hierarchy-item:not(:last-child):after {
+        content: '';
+        position: absolute;
+        width: 2px;
+        background: var(--primary-1);
+        top: 100%;
+        bottom: -1.25rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .hierarchy-node {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.85rem 1.25rem;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: 0.3px;
+    }
+    .hierarchy-node i {
+        margin-right: 0.5rem;
+    }
+    .hierarchy-node.root-management-group {
+        background: #351c70;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.management-group {
+        background: #512fab;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.subscription {
+        background: #19244b;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.resource-group {
+        background: #622525;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-node.resource {
+        background: #0a3323;
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .hierarchy-label {
+        font-size: 0.75rem;
+        color: var(--white);
+        text-align: center;
+        opacity: 0.75;
+    }
+    .expand-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(45deg, rgba(255, 113, 91, 0.1), rgba(255, 113, 91, 0.2));
+        color: var(--primary-1);
+        border: 1px solid rgba(255, 113, 91, 0.3);
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+    .expand-btn:hover {
+        background: linear-gradient(45deg, rgba(255, 113, 91, 0.2), rgba(255, 113, 91, 0.3));
+        transform: translateY(-1px);
+    }
+    .expand-btn i {
+        margin-right: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .expand-btn i.rotate {
+        transform: rotate(180deg);
+    }
+    .resource-table-container {
+        background: rgba(18, 20, 29, 0.4);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+    .resource-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        background: rgba(18, 20, 29, 0.8);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .resource-search {
+        flex: 1;
+        max-width: 400px;
+    }
+    .resource-stats {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .badge.rounded-pill {
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+    .resource-card {
+        display: flex;
+        flex-direction: column;
+        background: rgba(18, 20, 29, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+    .resource-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 113, 91, 0.2);
+    }
+    .resource-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        background: rgba(18, 20, 29, 0.7);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .resource-card-body {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: l0.5rem 0.75rem;
+    }
+    .resource-name {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        color: var(--white);
+    }
+    .resource-name i {
+        color: var(--primary-1);
+        margin-right: 0.5rem;
+    }
+    .resource-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .resource-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.15rem 0.5rem;
+        border-radius: 3px;
+        font-size: 0.7rem;
+        background: rgba(18, 20, 29, 0.5);
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        word-break: break-word;
+    }
+    .resource-badge i {
+        margin-right: 0.25rem;
+        font-size: 0.7rem;
+        flex-shrink: 0;
+    }
+    .resource-badge code {
+        word-break: break-all;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+    .inheritance-info {
+        background: linear-gradient(45deg, rgba(25, 36, 75, 0.3), rgba(25, 36, 75, 0.4));
+        border: 1px solid rgba(60, 92, 207, 0.3);
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        color: var(--white);
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+    .resource-search input {
+        color: var(--white) !important;
+    }
+    .hierarchy-label {
+        font-size: 0.7rem;
+        color: var(--white);
+        text-align: center;
+    }
+    .no-resources {
+        background: rgba(18, 20, 29, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        padding: 1rem;
+        text-align: center;
+    }
+    .no-resources i {
+        font-size: 1.5rem;
+        color: var(--white);
+        margin-bottom: 0.5rem;
+    }
+    .no-resources-text {
+        color: var(--white);
+        font-size: 0.85rem;
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box">
+        <div class="p-2">
+            <div class="page-header">
+                <a href="{{ url_for('resource_groups.azure_resource_groups') }}" class="back-btn">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <div class="page-title">
+                        <i class="bi bi-folder-fill"></i> {{ resource_group.name }}
+                    </div>
+                    <div class="page-subtitle">
+                        <code>{{ resource_group.id }}</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Overview</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Resource Group Name</div>
+                        <div class="detail-value">{{ resource_group.name }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Location</div>
+                        <div class="detail-value">{{ resource_group.location }}</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="detail-item">
+                        <div class="detail-label">Provisioning State</div>
+                        <div class="detail-value">
+                            {% if resource_group.properties.provisioningState == 'Succeeded' %}
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: var(--primary-3);">
+                                {{ resource_group.properties.provisioningState }}
+                            </span>
+                            {% else %}
+                            <span class="badge" style="background: rgba(255, 147, 79, 0.2); color: var(--primary-2);">
+                                {{ resource_group.properties.provisioningState }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="detail-item">
+                        <div class="detail-label">Resource ID</div>
+                        <div class="detail-value"><code>{{ resource_group.id }}</code></div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-item">
+                        <div class="detail-label">Parent Subscription</div>
+                        <div class="detail-value">
+                            <a href="{{ url_for('subscriptions.subscription_details', subscription_id=resource_group.subscriptionId) }}" 
+                               class="btn btn-sm btn-primary py-0 px-2"
+                               style="font-size: 0.75rem; height: 24px; text-decoration: none;">
+                                <i class="bi bi-eye" style="font-size: 0.75rem"></i> {{ resource_group.subscriptionName }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% if resource_group.tags %}
+                <div class="col-md-12">
+                    <div class="detail-item">
+                        <div class="detail-label">Tags</div>
+                        <div class="detail-value" style="flex-wrap: wrap; height: auto; min-height: 32px">
+                            {% for key, value in resource_group.tags.items() %}
+                            <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;" title="{{ key }}: {{ value }}">
+                                {{ key }}: {{ value }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="mt-4">
+                <div class="d-flex align-items-center mb-2">
+                    <h6 class="mb-0" style="font-size: 0.9rem; color: var(--white);">
+                        <i class="bi bi-diagram-3-fill me-2" style="color: var(--primary-1);"></i> Permission Inheritance
+                    </h6>
+                    <button class="ms-auto" id="expandBtn" onclick="toggleHierarchy()" 
+                            style="width: auto; 
+                                  padding: 0.25rem 0.75rem; 
+                                  background-color: rgba(255, 113, 91, 0.1); 
+                                  border: 1px solid rgba(255, 113, 91, 0.2);
+                                  border-radius: 4px;
+                                  color: var(--primary-1);
+                                  font-size: 0.75rem;
+                                  font-weight: 500;
+                                  display: flex;
+                                  align-items: center;
+                                  transition: all 0.2s ease;">
+                        <i class="bi bi-chevron-down me-1" id="expandIcon" style="transition: transform 0.3s ease;"></i>
+                        <span id="expandText">Expand</span>
+                    </button>
+                </div>
+                <div class="hierarchy-diagram-container" id="diagramContainer" style="max-height: 0;">
+                    <div class="hierarchy-diagram collapsed" id="hierarchyDiagram">
+                        {% if resource_group.show_management_groups %}
+                            {% if resource_group.managementGroups and resource_group.managementGroups|length > 0 %}
+                                {% for mg in resource_group.managementGroups %}
+                                <div class="hierarchy-item">
+                                    <div class="hierarchy-node {% if mg.type == 'RootManagementGroup' %}root-management-group{% else %}management-group{% endif %}">
+                                        <i class="bi bi-diagram-3-fill"></i> {{ mg.name }}
+                                    </div>
+                                    <div class="hierarchy-label">
+                                        {% if mg.type == 'RootManagementGroup' %}Root {% endif %}Management Group Level Permissions
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="hierarchy-item">
+                                    <div class="hierarchy-node management-group" style="background: linear-gradient(45deg, #512fab, #4422a3); border-color: #512fab; opacity: 0.6;">
+                                        <i class="bi bi-exclamation-triangle-fill"></i> Management Group Data Not Retrieved
+                                    </div>
+                                    <div class="hierarchy-label">
+                                        Management Group information could not be retrieved or access is limited
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                        {% if resource_group.show_subscription %}
+                            <div class="hierarchy-item">
+                                <div class="hierarchy-node subscription">
+                                    <i class="bi bi-key-fill"></i> {{ resource_group.subscriptionName }}
+                                </div>
+                                <div class="hierarchy-label">Subscription Level Permissions</div>
+                            </div>
+                        {% endif %}
+                        <div class="hierarchy-item">
+                            <div class="hierarchy-node resource-group">
+                                <i class="bi bi-folder-fill"></i> {{ resource_group.name }}
+                            </div>
+                            <div class="hierarchy-label">Resource Group Level Permissions</div>
+                        </div>
+                        <div class="hierarchy-item">
+                            <div class="hierarchy-node resource">
+                                <i class="bi bi-boxes"></i> Resources
+                            </div>
+                            <div class="hierarchy-label">Resource Level Permissions</div>
+                        </div>
+                    </div>
+                    <div class="inheritance-info mt-2" style="font-size: 0.75rem; background: rgba(25, 36, 75, 0.3); border-color: rgba(25, 36, 75, 0.5);">
+                        <i class="bi bi-info-circle"></i> 
+                        {% if resource_group.highest_role_level == "management-group" %}
+                            In Azure, permissions follow a hierarchical inheritance model. Your service principal has roles at the Management Group level that are inherited by all lower levels following this order: 
+                            <strong>Management Groups → Subscriptions → Resource Groups → Resources</strong>.
+                        {% elif resource_group.highest_role_level == "subscription" %}
+                            In Azure, permissions follow a hierarchical inheritance model. Your service principal has roles at the Subscription level that are inherited by all lower levels following this order: 
+                            <strong>Subscriptions → Resource Groups → Resources</strong>.
+                        {% else %}
+                            Your service principal has roles assigned directly at the Resource Group level. These permissions apply to this Resource Group and are inherited by all Resources within it.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-boxes"></i>
+            <span>Resources</span>
+        </div>
+        <div class="card-body">
+            <div class="inheritance-info">
+                <i class="bi bi-info-circle"></i> Resources inherit role assignments from this Resource Group. Users with roles at the Resource Group level will have the same permissions for all Resources in this Resource Group.
+            </div>
+            {% if resource_group.resources %}
+            <div class="resource-table-container">
+                <div class="resource-header">
+                    <div class="resource-search">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                                <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                            </span>
+                            <input type="text" class="form-control border-0 bg-transparent py-1" id="resourceSearch" 
+                                placeholder="Search resources..." 
+                                oninput="filterResources()"
+                                style="
+                                    background-color: rgba(18, 20, 29, 0.6) !important;
+                                    color: var(--white);
+                                    border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                    height: 32px;
+                                ">
+                        </div>
+                    </div>
+                    <div class="resource-stats">
+                        <div class="badge rounded-pill bg-primary">
+                            <i class="bi bi-boxes me-1"></i>
+                            {{ resource_group.resources|length }} Resource{% if resource_group.resources|length != 1 %}s{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="resources-container p-2">
+                    <div class="row" id="resourcesList">
+                        {% for resource in resource_group.resources %}
+                        <div class="col-12 mb-2 resource-item">
+                            <div class="resource-card">
+                                <div class="resource-card-header">
+                                    <div class="resource-name">
+                                        {% if 'storage' in resource.type|lower %}
+                                        <i class="bi bi-hdd-fill"></i>
+                                        {% elif 'compute' in resource.type|lower or 'vm' in resource.type|lower %}
+                                        <i class="bi bi-cpu-fill"></i>
+                                        {% elif 'web' in resource.type|lower or 'app' in resource.type|lower %}
+                                        <i class="bi bi-globe"></i>
+                                        {% elif 'sql' in resource.type|lower or 'db' in resource.type|lower %}
+                                        <i class="bi bi-database-fill"></i>
+                                        {% elif 'network' in resource.type|lower %}
+                                        <i class="bi bi-diagram-3-fill"></i>
+                                        {% elif 'function' in resource.type|lower %}
+                                        <i class="bi bi-lightning-fill"></i>
+                                        {% elif 'keyvault' in resource.type|lower %}
+                                        <i class="bi bi-key-fill"></i>
+                                        {% else %}
+                                        <i class="bi bi-box-fill"></i>
+                                        {% endif %}
+                                        {{ resource.name }}
+                                    </div>
+                                </div>
+                                <div class="p-2">
+                                    <div class="resource-meta">
+                                        <div class="resource-badge">
+                                            <i class="bi bi-tag-fill"></i> 
+                                            <span title="{{ resource.type }}">{{ resource.type }}</span>
+                                        </div>
+                                        <div class="resource-badge" style="flex: 1; min-width: 0;">
+                                            <i class="bi bi-fingerprint"></i>
+                                            <code style="font-size: 0.7rem; background: transparent; padding: 0; word-break: break-all; white-space: normal;">{{ resource.id }}</code>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-resources">
+                <i class="bi bi-exclamation-circle"></i>
+                <div class="no-resources-text">
+                    No resources found in this resource group. Resources are Azure services or assets deployed within a resource group.
+                </div>
+                <div class="mt-3">
+                    <a href="https://portal.azure.com/#@/resource/subscriptions/{{ resource_group.subscriptionId }}/resourceGroups/{{ resource_group.name }}" 
+                       class="btn btn-sm btn-primary" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-cloud me-1"></i> View in Azure Portal
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleHierarchy() {
+        const diagram = document.getElementById('hierarchyDiagram');
+        const container = document.getElementById('diagramContainer');
+        const icon = document.getElementById('expandIcon');
+        const text = document.getElementById('expandText');
+        const btn = document.getElementById('expandBtn');
+        
+        if (diagram.classList.contains('collapsed')) {
+            // Expanding
+            diagram.classList.remove('collapsed');
+            container.style.maxHeight = '550px'; // Fixed height for consistency
+            icon.style.transform = 'rotate(180deg)';
+            text.textContent = 'Collapse';
+            btn.style.backgroundColor = 'rgba(60, 92, 207, 0.1)';
+            btn.style.borderColor = 'rgba(60, 92, 207, 0.2)';
+        } else {
+            // Collapsing
+            diagram.classList.add('collapsed');
+            container.style.maxHeight = '0';
+            icon.style.transform = 'rotate(0deg)';
+            text.textContent = 'Expand';
+            btn.style.backgroundColor = 'rgba(255, 113, 91, 0.1)';
+            btn.style.borderColor = 'rgba(255, 113, 91, 0.2)';
+        }
+    }
+
+    function filterResources() {
+        let input = document.getElementById('resourceSearch');
+        let filter = input.value.toUpperCase();
+        let items = document.querySelectorAll('.resource-item');
+
+        items.forEach(item => {
+            let resourceName = item.querySelector('.resource-name').textContent;
+            let resourceType = item.querySelector('.resource-meta').textContent;
+            
+            if (resourceName.toUpperCase().indexOf(filter) > -1 || resourceType.toUpperCase().indexOf(filter) > -1) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

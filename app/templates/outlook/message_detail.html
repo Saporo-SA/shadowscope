@@ -1,0 +1,441 @@
+{% extends "dashboard.html" %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+        --focus-ring: 0 0 0 3px rgba(255, 113, 91, 0.5);
+        --hover-transition: all 0.2s ease-in-out;
+        --message-bg: rgba(255, 255, 255, 0.92);
+        --message-text: #222;
+    }
+    html, body {
+        color: var(--gray-4);
+        background-color: var(--gray-1);
+        background-image: linear-gradient(45deg, rgba(18, 20, 29, 0.95), rgba(18, 20, 29, 0.98));          
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100%;
+        height: auto;
+        overflow-y: auto;
+    }
+    .message-container {
+        position: relative;
+        margin-top: 20px;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+        overflow: visible;
+        height: auto;
+    }
+    .message-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .message-subject {
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .message-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .message-meta-item {
+        display: flex;
+        align-items: flex-start;
+    }
+    .message-meta-label {
+        font-weight: bold;
+        color: var(--primary-1);
+        width: 80px;
+    }
+    .message-meta-value {
+        color: var(--gray-4);
+    }
+    .message-body {
+        padding: 1.5rem;
+        background: rgba(18, 20, 29, 0.6);
+        min-height: 300px;
+        max-height: none;
+        overflow: visible;
+    }
+    .message-body iframe {
+        width: 100%;
+        min-height: 300px;
+        border: none;
+        background: rgba(255, 255, 255, 0.9);
+    }
+    .message-attachments {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .attachment-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 113, 91, 0.1);
+        border-radius: 8px;
+        margin-right: 0.75rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    .attachment-item:hover {
+        background: rgba(255, 113, 91, 0.2);
+        transform: translateY(-2px);
+    }
+    .attachment-icon {
+        font-size: 1.25rem;
+        color: var(--primary-1);
+    }
+    .attachment-name {
+        color: white;
+    }
+    .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    .btn i {
+        font-size: 1rem;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .btn-outline-primary {
+        color: var(--primary-1);
+        border-color: var(--primary-1);
+        background-color: transparent;
+    }
+    .btn-outline-primary:hover {
+        background: var(--primary-1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(255, 113, 91, 0.3);
+    }
+    #message-content {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        padding: 16px;
+        color: var(--message-text);
+        background-color: var(--message-bg);
+        border-radius: 8px;
+        min-height: 300px;
+        line-height: 1.6;
+        overflow-wrap: break-word;
+        overflow: visible;
+        height: auto;
+    }
+    #message-content a {
+        color: var(--primary-4);
+        text-decoration: none;
+    }
+    #message-content a:hover {
+        text-decoration: underline;
+    }
+    #message-content img {
+        max-width: 100%;
+        height: auto;
+    }
+    .importance-flag {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        background-color: #ff4136;
+        color: white;
+    }
+    .sender-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-5));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-right: 15px;
+    }
+    .print-button {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        color: var(--gray-4);
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: var(--hover-transition);
+    }
+    .print-button:hover {
+        color: white;
+    }
+    .message-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    a:focus, button:focus, input:focus {
+        outline: none;
+        box-shadow: var(--focus-ring);
+    }
+    @media (max-width: 768px) {
+        .message-meta-item {
+            flex-direction: column;
+        }
+        .message-meta-label {
+            width: auto;
+            margin-bottom: 5px;
+        }
+        .message-toolbar {
+            justify-content: center;
+            padding-top: 15px;
+        }
+        .sender-avatar {
+            display: none;
+        }
+    }
+    @media print {
+        body {
+            background: white !important;
+            color: black !important;
+        }
+        .content-box {
+            border: none !important;
+            box-shadow: none !important;
+            background: white !important;
+        }
+        .message-header {
+            color: black !important;
+            border-bottom: 1px solid #ddd !important;
+        }
+        .message-subject {
+            color: black !important;
+        }
+        .message-meta-label,
+        .message-meta-value {
+            color: black !important;
+        }
+        .message-body {
+            background: white !important;
+            padding: 0 !important;
+        }
+        #message-content {
+            background: white !important;
+            color: black !important;
+            padding: 0 !important;
+        }
+        .print-button,
+        .message-navigation,
+        .d-flex.justify-content-between.align-items-center.p-3.border-bottom {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="message-container">
+    <div class="content-box mb-3">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom" style="border-color: rgba(255, 113, 91, 0.1) !important;">
+            <h5 class="mb-0">
+                <a href="{{ url_for('outlook.view_mailbox', user_id=message.userId|default(user_id)) }}" class="text-decoration-none me-2" title="Back to Mailbox">
+                    <i class="bi bi-arrow-left" style="color: var(--primary-1);"></i>
+                </a>
+                Email Details
+            </h5>
+            <div class="d-flex gap-2">
+                {% if access.outlook.features.send_email %}
+                <a href="{{ url_for('outlook.reply_email', user_id=message.userId|default(user_id), message_id=message.id) }}" class="btn btn-primary">
+                    <i class="bi bi-reply"></i> Reply
+                </a>
+                {% endif %}
+                <button class="btn btn-outline-primary d-none d-md-inline-flex" id="print-btn" title="Print email">
+                    <i class="bi bi-printer"></i>
+                </button>
+            </div>
+        </div>
+        <div class="message-header">
+            <div class="d-flex align-items-center mb-3">
+                <div class="sender-avatar" title="{{ message.senderName }}">
+                    {{ message.senderName|first|upper }}
+                </div>
+                <h1 class="message-subject mb-0">
+                    {{ message.subject }}
+                    {% if message.importance == 'high' %}
+                    <span class="importance-flag">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Important
+                    </span>
+                    {% endif %}
+                </h1>
+                <button class="print-button d-md-none" id="mobile-print" title="Print">
+                    <i class="bi bi-printer"></i>
+                </button>
+            </div>
+            <div class="message-meta">
+                <div class="message-meta-item">
+                    <div class="message-meta-label">From:</div>
+                    <div class="message-meta-value">
+                        {{ message.senderName }} &lt;{{ message.senderEmail }}&gt;
+                    </div>
+                </div>
+            </div>
+            <div class="message-meta">
+                <div class="message-meta-item">
+                    <div class="message-meta-label">To:</div>
+                    <div class="message-meta-value">{{ message.formatted.to }}</div>
+                </div>
+            </div>
+            {% if message.formatted.cc %}
+            <div class="message-meta">
+                <div class="message-meta-item">
+                    <div class="message-meta-label">CC:</div>
+                    <div class="message-meta-value">{{ message.formatted.cc }}</div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="message-meta">
+                <div class="message-meta-item">
+                    <div class="message-meta-label">Date:</div>
+                    <div class="message-meta-value">{{ message.formattedDate }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="message-body">
+            <div id="message-content">{{ message.body.content|safe }}</div>
+        </div>
+        {% if message.attachments and message.attachments|length > 0 %}
+        <div class="message-attachments">
+            <h6 class="mb-3"><i class="bi bi-paperclip me-2"></i> Attachments ({{ message.attachments|length }})</h6>
+            <div class="attachment-list">
+                {% for attachment in message.attachments %}
+                <a href="{{ url_for('outlook.download_attachment', user_id=user_id, message_id=message.id, attachment_id=attachment.id) }}" 
+                   class="attachment-item text-decoration-none"
+                   data-attachment-id="{{ attachment.id }}"
+                   data-attachment-type="{{ attachment.contentType }}"
+                   data-attachment-name="{{ attachment.name }}">
+                    {% if attachment.contentType.startswith('image/') %}
+                        <i class="bi bi-file-image attachment-icon"></i>
+                    {% elif attachment.contentType.startswith('application/pdf') %}
+                        <i class="bi bi-file-pdf attachment-icon"></i>
+                    {% elif attachment.contentType.startswith('application/vnd.openxmlformats-officedocument.spreadsheetml') or attachment.contentType.startswith('application/vnd.ms-excel') %}
+                        <i class="bi bi-file-excel attachment-icon"></i>
+                    {% elif attachment.contentType.startswith('application/vnd.openxmlformats-officedocument.wordprocessingml') or attachment.contentType.startswith('application/msword') %}
+                        <i class="bi bi-file-word attachment-icon"></i>
+                    {% elif attachment.contentType.startswith('application/vnd.openxmlformats-officedocument.presentationml') or attachment.contentType.startswith('application/vnd.ms-powerpoint') %}
+                        <i class="bi bi-file-ppt attachment-icon"></i>
+                    {% else %}
+                        <i class="bi bi-file-earmark attachment-icon"></i>
+                    {% endif %}
+                    <span class="attachment-name">{{ attachment.name }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="p-3 border-top" style="border-color: rgba(255, 113, 91, 0.1) !important;">
+            <div class="message-navigation">
+                {% if prev_message_id %}
+                <a href="{{ url_for('outlook.view_message', user_id=message.userId|default(user_id), message_id=prev_message_id) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Previous Message
+                </a>
+                {% else %}
+                <button class="btn btn-sm btn-outline-primary" disabled>
+                    <i class="bi bi-arrow-left"></i> Previous Message
+                </button>
+                {% endif %}
+                <a href="{{ url_for('outlook.view_mailbox', user_id=message.userId|default(user_id)) }}" class="btn btn-sm btn-outline-primary d-none d-md-inline-flex">
+                    <i class="bi bi-grid"></i> Back to List
+                </a>
+                {% if next_message_id %}
+                <a href="{{ url_for('outlook.view_message', user_id=message.userId|default(user_id), message_id=next_message_id) }}" class="btn btn-sm btn-outline-primary">
+                    Next Message <i class="bi bi-arrow-right"></i>
+                </a>
+                {% else %}
+                <button class="btn btn-sm btn-outline-primary" disabled>
+                    Next Message <i class="bi bi-arrow-right"></i>
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply styles to message content
+        const messageContent = document.getElementById('message-content');
+        if (messageContent) {
+            // Style links in the content
+            const links = messageContent.querySelectorAll('a');
+            links.forEach(link => {
+                // Add target blank for external links
+                if (link.host !== window.location.host) {
+                    link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener noreferrer');
+                }
+            });
+            
+            // Add responsive styles to tables
+            const tables = messageContent.querySelectorAll('table');
+            tables.forEach(table => {
+                table.style.maxWidth = '100%';
+                table.style.overflowX = 'auto';
+                table.style.display = 'block';
+            });
+            
+            // Limit image sizes
+            const images = messageContent.querySelectorAll('img');
+            images.forEach(img => {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+            });
+        }
+        
+        // Print functionality
+        document.getElementById('print-btn')?.addEventListener('click', function() {
+            window.print();
+        });
+        
+        document.getElementById('mobile-print')?.addEventListener('click', function() {
+            window.print();
+        });
+    });
+</script>
+{% endblock %}

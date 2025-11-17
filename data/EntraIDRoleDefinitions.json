@@ -1,0 +1,1018 @@
+{
+  "62e90394-69f5-4237-9190-012177145e10": {
+    "id": "62e90394-69f5-4237-9190-012177145e10",
+    "displayName": "Global Administrator",
+    "description": "Can manage all aspects of Microsoft Entra ID and Microsoft services that use Microsoft Entra identities.",
+    "templateId": "62e90394-69f5-4237-9190-012177145e10",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "10dae51f-b6af-4016-8d66-8c2a99b929b3": {
+    "id": "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+    "displayName": "Guest User",
+    "description": "Default role for guest users. Can read a limited set of directory information.",
+    "templateId": "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "2af84b1e-32c8-42b7-82bc-daa82404023b": {
+    "id": "2af84b1e-32c8-42b7-82bc-daa82404023b",
+    "displayName": "Restricted Guest User",
+    "description": "Restricted role for guest users. Can read a limited set of directory information.",
+    "templateId": "2af84b1e-32c8-42b7-82bc-daa82404023b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "95e79109-95c0-4d8e-aee3-d01accf2d47b": {
+    "id": "95e79109-95c0-4d8e-aee3-d01accf2d47b",
+    "displayName": "Guest Inviter",
+    "description": "Can invite guest users independent of the 'members can invite guests' setting.",
+    "templateId": "95e79109-95c0-4d8e-aee3-d01accf2d47b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "fe930be7-5e62-47db-91af-98c3a49a38b1": {
+    "id": "fe930be7-5e62-47db-91af-98c3a49a38b1",
+    "displayName": "User Administrator",
+    "description": "Can manage all aspects of users and groups, including resetting passwords for limited admins.",
+    "templateId": "fe930be7-5e62-47db-91af-98c3a49a38b1",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "729827e3-9c14-49f7-bb1b-9608f156bbb8": {
+    "id": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+    "displayName": "Helpdesk Administrator",
+    "description": "Can reset passwords for non-administrators and Helpdesk Administrators.",
+    "templateId": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "f023fd81-a637-4b56-95fd-791ac0226033": {
+    "id": "f023fd81-a637-4b56-95fd-791ac0226033",
+    "displayName": "Service Support Administrator",
+    "description": "Can read service health information and manage support tickets.",
+    "templateId": "f023fd81-a637-4b56-95fd-791ac0226033",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "b0f54661-2d74-4c50-afa3-1ec803f12efe": {
+    "id": "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+    "displayName": "Billing Administrator",
+    "description": "Can perform common billing related tasks like updating payment information.",
+    "templateId": "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "a0b1b346-4d3e-4e8b-98f8-753987be4970": {
+    "id": "a0b1b346-4d3e-4e8b-98f8-753987be4970",
+    "displayName": "User",
+    "description": "Default role for member users. Can read all and write a limited set of directory information.",
+    "templateId": "a0b1b346-4d3e-4e8b-98f8-753987be4970",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "4ba39ca4-527c-499a-b93d-d9b492c50246": {
+    "id": "4ba39ca4-527c-499a-b93d-d9b492c50246",
+    "displayName": "Partner Tier1 Support",
+    "description": "Do not use - not intended for general use.",
+    "templateId": "4ba39ca4-527c-499a-b93d-d9b492c50246",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8": {
+    "id": "e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8",
+    "displayName": "Partner Tier2 Support",
+    "description": "Do not use - not intended for general use.",
+    "templateId": "e00e864a-17c5-4a4b-9c06-f5b95a8d5bd8",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "88d8e3e3-8f55-4a1e-953a-9b9898b8876b": {
+    "id": "88d8e3e3-8f55-4a1e-953a-9b9898b8876b",
+    "displayName": "Directory Readers",
+    "description": "Can read basic directory information. Commonly used to grant directory read access to applications and guests.",
+    "templateId": "88d8e3e3-8f55-4a1e-953a-9b9898b8876b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9360feb5-f418-4baa-8175-e2a00bac4301": {
+    "id": "9360feb5-f418-4baa-8175-e2a00bac4301",
+    "displayName": "Directory Writers",
+    "description": "Can read and write basic directory information. For granting access to applications, not intended for users.",
+    "templateId": "9360feb5-f418-4baa-8175-e2a00bac4301",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "29232cdf-9323-42fd-ade2-1d097af3e4de": {
+    "id": "29232cdf-9323-42fd-ade2-1d097af3e4de",
+    "displayName": "Exchange Administrator",
+    "description": "Can manage all aspects of the Exchange product.",
+    "templateId": "29232cdf-9323-42fd-ade2-1d097af3e4de",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "f28a1f50-f6e7-4571-818b-6a12f2af6b6c": {
+    "id": "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+    "displayName": "SharePoint Administrator",
+    "description": "Can manage all aspects of the SharePoint service.",
+    "templateId": "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "75941009-915a-4869-abe7-691bff18279e": {
+    "id": "75941009-915a-4869-abe7-691bff18279e",
+    "displayName": "Skype for Business Administrator",
+    "description": "Can manage all aspects of the Skype for Business product.",
+    "templateId": "75941009-915a-4869-abe7-691bff18279e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "d405c6df-0af8-4e3b-95e4-4d06e542189e": {
+    "id": "d405c6df-0af8-4e3b-95e4-4d06e542189e",
+    "displayName": "Device Users",
+    "description": "Deprecated - Do Not Use.",
+    "templateId": "d405c6df-0af8-4e3b-95e4-4d06e542189e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9f06204d-73c1-4d4c-880a-6edb90606fd8": {
+    "id": "9f06204d-73c1-4d4c-880a-6edb90606fd8",
+    "displayName": "Azure AD Joined Device Local Administrator",
+    "description": "Users assigned to this role are added to the local administrators group on Microsoft Entra joined devices.",
+    "templateId": "9f06204d-73c1-4d4c-880a-6edb90606fd8",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9c094953-4995-41c8-84c8-3ebb9b32c93f": {
+    "id": "9c094953-4995-41c8-84c8-3ebb9b32c93f",
+    "displayName": "Device Join",
+    "description": "Deprecated - Do Not Use.",
+    "templateId": "9c094953-4995-41c8-84c8-3ebb9b32c93f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "c34f683f-4d5a-4403-affd-6615e00e3a7f": {
+    "id": "c34f683f-4d5a-4403-affd-6615e00e3a7f",
+    "displayName": "Workplace Device Join",
+    "description": "Deprecated - Do Not Use.",
+    "templateId": "c34f683f-4d5a-4403-affd-6615e00e3a7f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "17315797-102d-40b4-93e0-432062caca18": {
+    "id": "17315797-102d-40b4-93e0-432062caca18",
+    "displayName": "Compliance Administrator",
+    "description": "Can read and manage compliance configuration and reports in Microsoft Entra ID and Microsoft 365.",
+    "templateId": "17315797-102d-40b4-93e0-432062caca18",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "d29b2b05-8046-44ba-8758-1e26182fcf32": {
+    "id": "d29b2b05-8046-44ba-8758-1e26182fcf32",
+    "displayName": "Directory Synchronization Accounts",
+    "description": "Only used by Microsoft Entra Connect service.",
+    "templateId": "d29b2b05-8046-44ba-8758-1e26182fcf32",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "2b499bcd-da44-4968-8aec-78e1674fa64d": {
+    "id": "2b499bcd-da44-4968-8aec-78e1674fa64d",
+    "displayName": "Device Managers",
+    "description": "Deprecated - Do Not Use.",
+    "templateId": "2b499bcd-da44-4968-8aec-78e1674fa64d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3": {
+    "id": "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+    "displayName": "Application Administrator",
+    "description": "Can create and manage all aspects of app registrations and enterprise apps.",
+    "templateId": "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "cf1c38e5-3621-4004-a7cb-879624dced7c": {
+    "id": "cf1c38e5-3621-4004-a7cb-879624dced7c",
+    "displayName": "Application Developer",
+    "description": "Can create application registrations independent of the 'Users can register applications' setting.",
+    "templateId": "cf1c38e5-3621-4004-a7cb-879624dced7c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "5d6b6bb7-de71-4623-b4af-96380a352509": {
+    "id": "5d6b6bb7-de71-4623-b4af-96380a352509",
+    "displayName": "Security Reader",
+    "description": "Can read security information and reports in Microsoft Entra ID and Office 365.",
+    "templateId": "5d6b6bb7-de71-4623-b4af-96380a352509",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "194ae4cb-b126-40b2-bd5b-6091b380977d": {
+    "id": "194ae4cb-b126-40b2-bd5b-6091b380977d",
+    "displayName": "Security Administrator",
+    "description": "Can read security information and reports, and manage configuration in Microsoft Entra ID and Office 365.",
+    "templateId": "194ae4cb-b126-40b2-bd5b-6091b380977d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e8611ab8-c189-46e8-94e1-60213ab1f814": {
+    "id": "e8611ab8-c189-46e8-94e1-60213ab1f814",
+    "displayName": "Privileged Role Administrator",
+    "description": "Can manage role assignments in Microsoft Entra ID, and all aspects of Privileged Identity Management.",
+    "templateId": "e8611ab8-c189-46e8-94e1-60213ab1f814",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "3a2c62db-5318-420d-8d74-23affee5d9d5": {
+    "id": "3a2c62db-5318-420d-8d74-23affee5d9d5",
+    "displayName": "Intune Administrator",
+    "description": "Can manage all aspects of the Intune product.",
+    "templateId": "3a2c62db-5318-420d-8d74-23affee5d9d5",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "158c047a-c907-4556-b7ef-446551a6b5f7": {
+    "id": "158c047a-c907-4556-b7ef-446551a6b5f7",
+    "displayName": "Cloud Application Administrator",
+    "description": "Can create and manage all aspects of app registrations and enterprise apps except App Proxy.",
+    "templateId": "158c047a-c907-4556-b7ef-446551a6b5f7",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "5c4f9dcd-47dc-4cf7-8c9a-9e4207cbfc91": {
+    "id": "5c4f9dcd-47dc-4cf7-8c9a-9e4207cbfc91",
+    "displayName": "Customer LockBox Access Approver",
+    "description": "Can approve Microsoft support requests to access customer organizational data.",
+    "templateId": "5c4f9dcd-47dc-4cf7-8c9a-9e4207cbfc91",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "44367163-eba1-44c3-98af-f5787879f96a": {
+    "id": "44367163-eba1-44c3-98af-f5787879f96a",
+    "displayName": "Dynamics 365 Administrator",
+    "description": "Can manage all aspects of the Dynamics 365 product.",
+    "templateId": "44367163-eba1-44c3-98af-f5787879f96a",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "a9ea8996-122f-4c74-9520-8edcd192826c": {
+    "id": "a9ea8996-122f-4c74-9520-8edcd192826c",
+    "displayName": "Fabric Administrator",
+    "description": "Manages all aspects of Microsoft Fabric.",
+    "templateId": "a9ea8996-122f-4c74-9520-8edcd192826c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9": {
+    "id": "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+    "displayName": "Conditional Access Administrator",
+    "description": "Can manage Conditional Access capabilities.",
+    "templateId": "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "4a5d8f65-41da-4de4-8968-e035b65339cf": {
+    "id": "4a5d8f65-41da-4de4-8968-e035b65339cf",
+    "displayName": "Reports Reader",
+    "description": "Can read sign-in and audit reports.",
+    "templateId": "4a5d8f65-41da-4de4-8968-e035b65339cf",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b": {
+    "id": "790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b",
+    "displayName": "Message Center Reader",
+    "description": "Can read messages and updates for their organization in Office 365 Message Center only.",
+    "templateId": "790c1fb9-7f7d-4f88-86a1-ef1f95c05c1b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "7495fdc4-34c4-4d15-a289-98788ce399fd": {
+    "id": "7495fdc4-34c4-4d15-a289-98788ce399fd",
+    "displayName": "Azure Information Protection Administrator",
+    "description": "Can manage all aspects of the Azure Information Protection product.",
+    "templateId": "7495fdc4-34c4-4d15-a289-98788ce399fd",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "38a96431-2bdf-4b4c-8b6e-5d3d8abac1a4": {
+    "id": "38a96431-2bdf-4b4c-8b6e-5d3d8abac1a4",
+    "displayName": "Desktop Analytics Administrator",
+    "description": "Can access and manage Desktop management tools and services.",
+    "templateId": "38a96431-2bdf-4b4c-8b6e-5d3d8abac1a4",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "4d6ac14f-3453-41d0-bef9-a3e0c569773a": {
+    "id": "4d6ac14f-3453-41d0-bef9-a3e0c569773a",
+    "displayName": "License Administrator",
+    "description": "Can manage product licenses on users and groups.",
+    "templateId": "4d6ac14f-3453-41d0-bef9-a3e0c569773a",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "7698a772-787b-4ac8-901f-60d6b08affd2": {
+    "id": "7698a772-787b-4ac8-901f-60d6b08affd2",
+    "displayName": "Cloud Device Administrator",
+    "description": "Limited access to manage devices in Microsoft Entra ID.",
+    "templateId": "7698a772-787b-4ac8-901f-60d6b08affd2",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "c4e39bd9-1100-46d3-8c65-fb160da0071f": {
+    "id": "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+    "displayName": "Authentication Administrator",
+    "description": "Can access to view, set and reset authentication method information for any non-admin user.",
+    "templateId": "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "7be44c8a-adaf-4e2a-84d6-ab2649e08a13": {
+    "id": "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+    "displayName": "Privileged Authentication Administrator",
+    "description": "Can access to view, set and reset authentication method information for any user (admin or non-admin).",
+    "templateId": "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "baf37b3a-610e-45da-9e62-d9d1e5e8914b": {
+    "id": "baf37b3a-610e-45da-9e62-d9d1e5e8914b",
+    "displayName": "Teams Communications Administrator",
+    "description": "Can manage calling and meetings features within the Microsoft Teams service.",
+    "templateId": "baf37b3a-610e-45da-9e62-d9d1e5e8914b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "f70938a0-fc10-4177-9e90-2178f8765737": {
+    "id": "f70938a0-fc10-4177-9e90-2178f8765737",
+    "displayName": "Teams Communications Support Engineer",
+    "description": "Can troubleshoot communications issues within Teams using advanced tools.",
+    "templateId": "f70938a0-fc10-4177-9e90-2178f8765737",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "fcf91098-03e3-41a9-b5ba-6f0ec8188a12": {
+    "id": "fcf91098-03e3-41a9-b5ba-6f0ec8188a12",
+    "displayName": "Teams Communications Support Specialist",
+    "description": "Can troubleshoot communications issues within Teams using basic tools.",
+    "templateId": "fcf91098-03e3-41a9-b5ba-6f0ec8188a12",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "69091246-20e8-4a56-aa4d-066075b2a7a8": {
+    "id": "69091246-20e8-4a56-aa4d-066075b2a7a8",
+    "displayName": "Teams Administrator",
+    "description": "Can manage the Microsoft Teams service.",
+    "templateId": "69091246-20e8-4a56-aa4d-066075b2a7a8",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "eb1f4a8d-243a-41f0-9fbd-c7cdf6c5ef7c": {
+    "id": "eb1f4a8d-243a-41f0-9fbd-c7cdf6c5ef7c",
+    "displayName": "Insights Administrator",
+    "description": "Has administrative access in the Microsoft 365 Insights app.",
+    "templateId": "eb1f4a8d-243a-41f0-9fbd-c7cdf6c5ef7c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "ac16e43d-7b2d-40e0-ac05-243ff356ab5b": {
+    "id": "ac16e43d-7b2d-40e0-ac05-243ff356ab5b",
+    "displayName": "Message Center Privacy Reader",
+    "description": "Can read security messages and updates in Office 365 Message Center only.",
+    "templateId": "ac16e43d-7b2d-40e0-ac05-243ff356ab5b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "6e591065-9bad-43ed-90f3-e9424366d2f0": {
+    "id": "6e591065-9bad-43ed-90f3-e9424366d2f0",
+    "displayName": "External ID User Flow Administrator",
+    "description": "Can create and manage all aspects of user flows.",
+    "templateId": "6e591065-9bad-43ed-90f3-e9424366d2f0",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "0f971eea-41eb-4569-a71e-57bb8a3eff1e": {
+    "id": "0f971eea-41eb-4569-a71e-57bb8a3eff1e",
+    "displayName": "External ID User Flow Attribute Administrator",
+    "description": "Can create and manage the attribute schema available to all user flows.",
+    "templateId": "0f971eea-41eb-4569-a71e-57bb8a3eff1e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "aaf43236-0c0d-4d5f-883a-6955382ac081": {
+    "id": "aaf43236-0c0d-4d5f-883a-6955382ac081",
+    "displayName": "B2C IEF Keyset Administrator",
+    "description": "Can manage secrets for federation and encryption in the Identity Experience Framework (IEF).",
+    "templateId": "aaf43236-0c0d-4d5f-883a-6955382ac081",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "3edaf663-341e-4475-9f94-5c398ef6c070": {
+    "id": "3edaf663-341e-4475-9f94-5c398ef6c070",
+    "displayName": "B2C IEF Policy Administrator",
+    "description": "Can create and manage trust framework policies in the Identity Experience Framework (IEF).",
+    "templateId": "3edaf663-341e-4475-9f94-5c398ef6c070",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "be2f45a1-457d-42af-a067-6ec1fa63bc45": {
+    "id": "be2f45a1-457d-42af-a067-6ec1fa63bc45",
+    "displayName": "External Identity Provider Administrator",
+    "description": "Can configure identity providers for use in direct federation.",
+    "templateId": "be2f45a1-457d-42af-a067-6ec1fa63bc45",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e6d1a23a-da11-4be4-9570-befc86d067a7": {
+    "id": "e6d1a23a-da11-4be4-9570-befc86d067a7",
+    "displayName": "Compliance Data Administrator",
+    "description": "Creates and manages compliance content.",
+    "templateId": "e6d1a23a-da11-4be4-9570-befc86d067a7",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "5f2222b1-57c3-48ba-8ad5-d4759f1fde6f": {
+    "id": "5f2222b1-57c3-48ba-8ad5-d4759f1fde6f",
+    "displayName": "Security Operator",
+    "description": "Creates and manages security events.",
+    "templateId": "5f2222b1-57c3-48ba-8ad5-d4759f1fde6f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "74ef975b-6605-40af-a5d2-b9539d836353": {
+    "id": "74ef975b-6605-40af-a5d2-b9539d836353",
+    "displayName": "Kaizala Administrator",
+    "description": "Can manage settings for Microsoft Kaizala.",
+    "templateId": "74ef975b-6605-40af-a5d2-b9539d836353",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "f2ef992c-3afb-46b9-b7cf-a126ee74c451": {
+    "id": "f2ef992c-3afb-46b9-b7cf-a126ee74c451",
+    "displayName": "Global Reader",
+    "description": "Can read everything that a Global Administrator can, but not update anything.",
+    "templateId": "f2ef992c-3afb-46b9-b7cf-a126ee74c451",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "0964bb5e-9bdb-4d7b-ac29-58e794862a40": {
+    "id": "0964bb5e-9bdb-4d7b-ac29-58e794862a40",
+    "displayName": "Search Administrator",
+    "description": "Can create and manage all aspects of Microsoft Search settings.",
+    "templateId": "0964bb5e-9bdb-4d7b-ac29-58e794862a40",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "8835291a-918c-4fd7-a9ce-faa49f0cf7d9": {
+    "id": "8835291a-918c-4fd7-a9ce-faa49f0cf7d9",
+    "displayName": "Search Editor",
+    "description": "Can create and manage the editorial content such as bookmarks, Q and As, locations, floorplan.",
+    "templateId": "8835291a-918c-4fd7-a9ce-faa49f0cf7d9",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "966707d0-3269-4727-9be2-8c3a10f19b9d": {
+    "id": "966707d0-3269-4727-9be2-8c3a10f19b9d",
+    "displayName": "Password Administrator",
+    "description": "Can reset passwords for non-administrators and Password Administrators.",
+    "templateId": "966707d0-3269-4727-9be2-8c3a10f19b9d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "644ef478-e28f-4e28-b9dc-3fdde9aa0b1f": {
+    "id": "644ef478-e28f-4e28-b9dc-3fdde9aa0b1f",
+    "displayName": "Printer Administrator",
+    "description": "Can manage all aspects of printers and printer connectors.",
+    "templateId": "644ef478-e28f-4e28-b9dc-3fdde9aa0b1f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e8cef6f1-e4bd-4ea8-bc07-4b8d950f4477": {
+    "id": "e8cef6f1-e4bd-4ea8-bc07-4b8d950f4477",
+    "displayName": "Printer Technician",
+    "description": "Can register and unregister printers and update printer status.",
+    "templateId": "e8cef6f1-e4bd-4ea8-bc07-4b8d950f4477",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "0526716b-113d-4c15-b2c8-68e3c22b9f80": {
+    "id": "0526716b-113d-4c15-b2c8-68e3c22b9f80",
+    "displayName": "Authentication Policy Administrator",
+    "description": "Can create and manage the authentication methods policy, tenant-wide MFA settings, password protection policy, and verifiable credentials.",
+    "templateId": "0526716b-113d-4c15-b2c8-68e3c22b9f80",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "fdd7a751-b60b-444a-984c-02652fe8fa1c": {
+    "id": "fdd7a751-b60b-444a-984c-02652fe8fa1c",
+    "displayName": "Groups Administrator",
+    "description": "Members of this role can create/manage groups, create/manage groups settings like naming and expiration policies, and view groups activity and audit reports.",
+    "templateId": "fdd7a751-b60b-444a-984c-02652fe8fa1c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "11648597-926c-4cf3-9c36-bcebb0ba8dcc": {
+    "id": "11648597-926c-4cf3-9c36-bcebb0ba8dcc",
+    "displayName": "Power Platform Administrator",
+    "description": "Can create and manage all aspects of Microsoft Dynamics 365, PowerApps and Microsoft Flow.",
+    "templateId": "11648597-926c-4cf3-9c36-bcebb0ba8dcc",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e3973bdf-4987-49ae-837a-ba8e231c7286": {
+    "id": "e3973bdf-4987-49ae-837a-ba8e231c7286",
+    "displayName": "Azure DevOps Administrator",
+    "description": "Can manage Azure DevOps organization policy and settings.",
+    "templateId": "e3973bdf-4987-49ae-837a-ba8e231c7286",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2": {
+    "id": "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2",
+    "displayName": "Hybrid Identity Administrator",
+    "description": "Can manage Active Directory to Microsoft Entra cloud provisioning, Microsoft Entra Connect, and federation settings.",
+    "templateId": "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "2b745bdf-0803-4d80-aa65-822c4493daac": {
+    "id": "2b745bdf-0803-4d80-aa65-822c4493daac",
+    "displayName": "Office Apps Administrator",
+    "description": "Can manage Office apps cloud services, including policy and settings management, and manage the ability to select, unselect and publish 'what's new' feature content to end-user's devices.",
+    "templateId": "2b745bdf-0803-4d80-aa65-822c4493daac",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "d37c8bed-0711-4417-ba38-b4abe66ce4c2": {
+    "id": "d37c8bed-0711-4417-ba38-b4abe66ce4c2",
+    "displayName": "Network Administrator",
+    "description": "Can manage network locations and review enterprise network design insights for Microsoft 365 Software as a Service applications.",
+    "templateId": "d37c8bed-0711-4417-ba38-b4abe66ce4c2",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "31e939ad-9672-4796-9c2e-873181342d2d": {
+    "id": "31e939ad-9672-4796-9c2e-873181342d2d",
+    "displayName": "Insights Business Leader",
+    "description": "Can view and share dashboards and insights via the M365 Insights app.",
+    "templateId": "31e939ad-9672-4796-9c2e-873181342d2d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "3d762c5a-1b6c-493f-843e-55a3b42923d4": {
+    "id": "3d762c5a-1b6c-493f-843e-55a3b42923d4",
+    "displayName": "Teams Devices Administrator",
+    "description": "Can perform management related tasks on Teams certified devices.",
+    "templateId": "3d762c5a-1b6c-493f-843e-55a3b42923d4",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "c430b396-e693-46cc-96f3-db01bf8bb62a": {
+    "id": "c430b396-e693-46cc-96f3-db01bf8bb62a",
+    "displayName": "Attack Simulation Administrator",
+    "description": "Can create and manage all aspects of attack simulation campaigns.",
+    "templateId": "c430b396-e693-46cc-96f3-db01bf8bb62a",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9c6df0f2-1e7c-4dc3-b195-66dfbd24aa8f": {
+    "id": "9c6df0f2-1e7c-4dc3-b195-66dfbd24aa8f",
+    "displayName": "Attack Payload Author",
+    "description": "Can create attack payloads that an administrator can initiate later.",
+    "templateId": "9c6df0f2-1e7c-4dc3-b195-66dfbd24aa8f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "75934031-6c7e-415a-99d7-48dbd49e875e": {
+    "id": "75934031-6c7e-415a-99d7-48dbd49e875e",
+    "displayName": "Usage Summary Reports Reader",
+    "description": "Can see only tenant level aggregates in Microsoft 365 Usage Analytics and Productivity Score.",
+    "templateId": "75934031-6c7e-415a-99d7-48dbd49e875e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "b5a8dcf3-09d5-43a9-a639-8e29ef291470": {
+    "id": "b5a8dcf3-09d5-43a9-a639-8e29ef291470",
+    "displayName": "Knowledge Administrator",
+    "description": "Can configure knowledge, learning, and other intelligent features.",
+    "templateId": "b5a8dcf3-09d5-43a9-a639-8e29ef291470",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "744ec460-397e-42ad-a462-8b3f9747a02c": {
+    "id": "744ec460-397e-42ad-a462-8b3f9747a02c",
+    "displayName": "Knowledge Manager",
+    "description": "Has access to topic management dashboard and can manage content.",
+    "templateId": "744ec460-397e-42ad-a462-8b3f9747a02c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "8329153b-31d0-4727-b945-745eb3bc5f31": {
+    "id": "8329153b-31d0-4727-b945-745eb3bc5f31",
+    "displayName": "Domain Name Administrator",
+    "description": "Can manage domain names in cloud and on-premises.",
+    "templateId": "8329153b-31d0-4727-b945-745eb3bc5f31",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "d2562ede-74db-457e-a7b6-544e236ebb61": {
+    "id": "d2562ede-74db-457e-a7b6-544e236ebb61",
+    "displayName": "AI Administrator",
+    "description": "Manage all aspects of Microsoft 365 Copilot and AI-related enterprise services in Microsoft 365.",
+    "templateId": "d2562ede-74db-457e-a7b6-544e236ebb61",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "8424c6f0-a189-499e-bbd0-26c1753c96d4": {
+    "id": "8424c6f0-a189-499e-bbd0-26c1753c96d4",
+    "displayName": "Attribute Definition Administrator",
+    "description": "Define and manage the definition of custom security attributes.",
+    "templateId": "8424c6f0-a189-499e-bbd0-26c1753c96d4",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "58a13ea3-c632-46ae-9ee0-9c0d43cd7f3d": {
+    "id": "58a13ea3-c632-46ae-9ee0-9c0d43cd7f3d",
+    "displayName": "Attribute Assignment Administrator",
+    "description": "Assign custom security attribute keys and values to supported Microsoft Entra objects.",
+    "templateId": "58a13ea3-c632-46ae-9ee0-9c0d43cd7f3d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "1d336d2c-4ae8-42ef-9711-b3604ce3fc2c": {
+    "id": "1d336d2c-4ae8-42ef-9711-b3604ce3fc2c",
+    "displayName": "Attribute Definition Reader",
+    "description": "Read the definition of custom security attributes.",
+    "templateId": "1d336d2c-4ae8-42ef-9711-b3604ce3fc2c",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "ffd52fa5-98dc-465c-991d-fc073eb59f8f": {
+    "id": "ffd52fa5-98dc-465c-991d-fc073eb59f8f",
+    "displayName": "Attribute Assignment Reader",
+    "description": "Read custom security attribute keys and values for supported Microsoft Entra objects.",
+    "templateId": "ffd52fa5-98dc-465c-991d-fc073eb59f8f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "31392ffb-586c-42d1-9346-e59415a2cc4e": {
+    "id": "31392ffb-586c-42d1-9346-e59415a2cc4e",
+    "displayName": "Exchange Recipient Administrator",
+    "description": "Can create or update Exchange Online recipients within the Exchange Online organization.",
+    "templateId": "31392ffb-586c-42d1-9346-e59415a2cc4e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "45d8d3c5-c802-45c6-b32a-1d70b5e1e86e": {
+    "id": "45d8d3c5-c802-45c6-b32a-1d70b5e1e86e",
+    "displayName": "Identity Governance Administrator",
+    "description": "Manage access using Microsoft Entra ID for identity governance scenarios.",
+    "templateId": "45d8d3c5-c802-45c6-b32a-1d70b5e1e86e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "892c5842-a9a6-463a-8041-72aa08ca3cf6": {
+    "id": "892c5842-a9a6-463a-8041-72aa08ca3cf6",
+    "displayName": "Cloud App Security Administrator",
+    "description": "Can manage all aspects of the Cloud App Security product.",
+    "templateId": "892c5842-a9a6-463a-8041-72aa08ca3cf6",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "32696413-001a-46ae-978c-ce0f6b3620d2": {
+    "id": "32696413-001a-46ae-978c-ce0f6b3620d2",
+    "displayName": "Windows Update Deployment Administrator",
+    "description": "Can create and manage all aspects of Windows Update deployments through the Windows Update for Business deployment service.",
+    "templateId": "32696413-001a-46ae-978c-ce0f6b3620d2",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "11451d60-acb2-45eb-a7d6-43d0f0125c13": {
+    "id": "11451d60-acb2-45eb-a7d6-43d0f0125c13",
+    "displayName": "Windows 365 Administrator",
+    "description": "Can provision and manage all aspects of Cloud PCs.",
+    "templateId": "11451d60-acb2-45eb-a7d6-43d0f0125c13",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "3f1acade-1e04-4fbc-9b69-f0302cd84aef": {
+    "id": "3f1acade-1e04-4fbc-9b69-f0302cd84aef",
+    "displayName": "Edge Administrator",
+    "description": "Manage all aspects of Microsoft Edge.",
+    "templateId": "3f1acade-1e04-4fbc-9b69-f0302cd84aef",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "810a2642-a034-447f-a5e8-41beaa378541": {
+    "id": "810a2642-a034-447f-a5e8-41beaa378541",
+    "displayName": "Yammer Administrator",
+    "description": "Manage all aspects of the Yammer service.",
+    "templateId": "810a2642-a034-447f-a5e8-41beaa378541",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "25a516ed-2fa0-40ea-a2d0-12923a21473a": {
+    "id": "25a516ed-2fa0-40ea-a2d0-12923a21473a",
+    "displayName": "Authentication Extensibility Administrator",
+    "description": "Customize sign in and sign up experiences for users by creating and managing custom authentication extensions.",
+    "templateId": "25a516ed-2fa0-40ea-a2d0-12923a21473a",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e300d9e7-4a2b-4295-9eff-f1c78b36cc98": {
+    "id": "e300d9e7-4a2b-4295-9eff-f1c78b36cc98",
+    "displayName": "Virtual Visits Administrator",
+    "description": "Manage and share Virtual Visits information and metrics from admin centers or the Virtual Visits app.",
+    "templateId": "e300d9e7-4a2b-4295-9eff-f1c78b36cc98",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "25df335f-86eb-4119-b717-0ff02de207e9": {
+    "id": "25df335f-86eb-4119-b717-0ff02de207e9",
+    "displayName": "Insights Analyst",
+    "description": "Access the analytical capabilities in Microsoft Viva Insights and run custom queries.",
+    "templateId": "25df335f-86eb-4119-b717-0ff02de207e9",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "1501b917-7653-4ff9-a4b5-203eaf33784f": {
+    "id": "1501b917-7653-4ff9-a4b5-203eaf33784f",
+    "displayName": "Microsoft Hardware Warranty Administrator",
+    "description": "Create and manage all aspects warranty claims and entitlements for Microsoft manufactured hardware, like Surface and HoloLens.",
+    "templateId": "1501b917-7653-4ff9-a4b5-203eaf33784f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "281fe777-fb20-4fbb-b7a3-ccebce5b0d96": {
+    "id": "281fe777-fb20-4fbb-b7a3-ccebce5b0d96",
+    "displayName": "Microsoft Hardware Warranty Specialist",
+    "description": "Create and read warranty claims for Microsoft manufactured hardware, like Surface and HoloLens.",
+    "templateId": "281fe777-fb20-4fbb-b7a3-ccebce5b0d96",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "112ca1a2-15ad-4102-995e-45b0bc479a6a": {
+    "id": "112ca1a2-15ad-4102-995e-45b0bc479a6a",
+    "displayName": "Tenant Creator",
+    "description": "Create new Microsoft Entra or Azure AD B2C tenants.",
+    "templateId": "112ca1a2-15ad-4102-995e-45b0bc479a6a",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "59d46f88-662b-457b-bceb-5c3809e5908f": {
+    "id": "59d46f88-662b-457b-bceb-5c3809e5908f",
+    "displayName": "Lifecycle Workflows Administrator",
+    "description": "Create and manage all aspects of workflows and tasks associated with Lifecycle Workflows in Microsoft Entra ID.",
+    "templateId": "59d46f88-662b-457b-bceb-5c3809e5908f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "92b086b3-e367-4ef2-b869-1de128fb986e": {
+    "id": "92b086b3-e367-4ef2-b869-1de128fb986e",
+    "displayName": "Viva Goals Administrator",
+    "description": "Manage and configure all aspects of Microsoft Viva Goals.",
+    "templateId": "92b086b3-e367-4ef2-b869-1de128fb986e",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "27460883-1df1-4691-b032-3b79643e5e63": {
+    "id": "27460883-1df1-4691-b032-3b79643e5e63",
+    "displayName": "User Experience Success Manager",
+    "description": "View product feedback, survey results, and reports to find training and communication opportunities.",
+    "templateId": "27460883-1df1-4691-b032-3b79643e5e63",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "af78dc32-cf4d-46f9-ba4e-4428526346b5": {
+    "id": "af78dc32-cf4d-46f9-ba4e-4428526346b5",
+    "displayName": "Permissions Management Administrator",
+    "description": "Manage all aspects of Entra Permissions Management.",
+    "templateId": "af78dc32-cf4d-46f9-ba4e-4428526346b5",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "507f53e4-4e52-4077-abd3-d2e1558b6ea2": {
+    "id": "507f53e4-4e52-4077-abd3-d2e1558b6ea2",
+    "displayName": "Organizational Messages Writer",
+    "description": "Write, publish, manage, and review the organizational messages for end-users through Microsoft product surfaces.",
+    "templateId": "507f53e4-4e52-4077-abd3-d2e1558b6ea2",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "ac434307-12b9-4fa1-a708-88bf58caabc1": {
+    "id": "ac434307-12b9-4fa1-a708-88bf58caabc1",
+    "displayName": "Global Secure Access Administrator",
+    "description": "Create and manage all aspects\u202fof Global Secure Internet Access and Microsoft Global Secure Private Access, including managing access to public and private endpoints.",
+    "templateId": "ac434307-12b9-4fa1-a708-88bf58caabc1",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "87761b17-1ed2-4af3-9acd-92a150038160": {
+    "id": "87761b17-1ed2-4af3-9acd-92a150038160",
+    "displayName": "Viva Pulse Administrator",
+    "description": "Can manage all settings for Microsoft Viva Pulse app.",
+    "templateId": "87761b17-1ed2-4af3-9acd-92a150038160",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "dd13091a-6207-4fc0-82ba-3641e056ab95": {
+    "id": "dd13091a-6207-4fc0-82ba-3641e056ab95",
+    "displayName": "Extended Directory User Administrator",
+    "description": "Manage all aspects of external user profiles in the extended directory for Teams.",
+    "templateId": "dd13091a-6207-4fc0-82ba-3641e056ab95",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "5b784334-f94b-471a-a387-e7219fc49ca2": {
+    "id": "5b784334-f94b-471a-a387-e7219fc49ca2",
+    "displayName": "Attribute Log Administrator",
+    "description": "Read audit logs and configure diagnostic settings for events related to custom security attributes.",
+    "templateId": "5b784334-f94b-471a-a387-e7219fc49ca2",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9c99539d-8186-4804-835f-fd51ef9e2dcd": {
+    "id": "9c99539d-8186-4804-835f-fd51ef9e2dcd",
+    "displayName": "Attribute Log Reader",
+    "description": "Read audit logs related to custom security attributes.",
+    "templateId": "9c99539d-8186-4804-835f-fd51ef9e2dcd",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "1076ac91-f3d9-41a7-a339-dcdf5f480acc": {
+    "id": "1076ac91-f3d9-41a7-a339-dcdf5f480acc",
+    "displayName": "Teams Reader",
+    "description": "Read everything in the Teams admin center, but not update anything.",
+    "templateId": "1076ac91-f3d9-41a7-a339-dcdf5f480acc",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "aa38014f-0993-46e9-9b45-30501a20909d": {
+    "id": "aa38014f-0993-46e9-9b45-30501a20909d",
+    "displayName": "Teams Telephony Administrator",
+    "description": "Manage voice and telephony features and troubleshoot communication issues within the Microsoft Teams service.",
+    "templateId": "aa38014f-0993-46e9-9b45-30501a20909d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "963797fb-eb3b-4cde-8ce3-5878b3f32a3f": {
+    "id": "963797fb-eb3b-4cde-8ce3-5878b3f32a3f",
+    "displayName": "Dynamics 365 Business Central Administrator",
+    "description": "Access and perform all administrative tasks on Dynamics 365 Business Central environments.",
+    "templateId": "963797fb-eb3b-4cde-8ce3-5878b3f32a3f",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "8c8b803f-96e1-4129-9349-20738d9f9652": {
+    "id": "8c8b803f-96e1-4129-9349-20738d9f9652",
+    "displayName": "Microsoft 365 Migration Administrator",
+    "description": "Perform all migration functionality to migrate content to Microsoft 365 using Migration Manager.",
+    "templateId": "8c8b803f-96e1-4129-9349-20738d9f9652",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "1a7d78b6-429f-476b-b8eb-35fb715fffd4": {
+    "id": "1a7d78b6-429f-476b-b8eb-35fb715fffd4",
+    "displayName": "SharePoint Embedded Administrator",
+    "description": "Manage all aspects of SharePoint Embedded containers.",
+    "templateId": "1a7d78b6-429f-476b-b8eb-35fb715fffd4",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "92ed04bf-c94a-4b82-9729-b799a7a4c178": {
+    "id": "92ed04bf-c94a-4b82-9729-b799a7a4c178",
+    "displayName": "Organizational Branding Administrator",
+    "description": "Manage all aspects of organizational branding in a tenant.",
+    "templateId": "92ed04bf-c94a-4b82-9729-b799a7a4c178",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e48398e2-f4bb-4074-8f31-4586725e205b": {
+    "id": "e48398e2-f4bb-4074-8f31-4586725e205b",
+    "displayName": "Organizational Messages Approver",
+    "description": "Review, approve, or reject new organizational messages for delivery in the Microsoft 365 admin center before they are sent to users.",
+    "templateId": "e48398e2-f4bb-4074-8f31-4586725e205b",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "ee67aa9c-e510-4759-b906-227085a7fd4d": {
+    "id": "ee67aa9c-e510-4759-b906-227085a7fd4d",
+    "displayName": "Microsoft Graph Data Connect Administrator",
+    "description": "Manage aspects of Microsoft Graph Data Connect service in a tenant.",
+    "templateId": "ee67aa9c-e510-4759-b906-227085a7fd4d",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "1707125e-0aa2-4d4d-8655-a7c786c76a25": {
+    "id": "1707125e-0aa2-4d4d-8655-a7c786c76a25",
+    "displayName": "Microsoft 365 Backup Administrator",
+    "description": "Back up and restore content across supported services (SharePoint, OneDrive, and Exchange Online) in Microsoft 365 Backup",
+    "templateId": "1707125e-0aa2-4d4d-8655-a7c786c76a25",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "a92aed5d-d78a-4d16-b381-09adb37eb3b0": {
+    "id": "a92aed5d-d78a-4d16-b381-09adb37eb3b0",
+    "displayName": "On Premises Directory Sync Account",
+    "description": "Only used by Microsoft Entra Connect Sync Account.",
+    "templateId": "a92aed5d-d78a-4d16-b381-09adb37eb3b0",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "422218e4-db15-4ef9-bbe0-8afb41546d79": {
+    "id": "422218e4-db15-4ef9-bbe0-8afb41546d79",
+    "displayName": "Attribute Provisioning Reader",
+    "description": "Read the provisioning configuration of all active custom security attributes for an application.",
+    "templateId": "422218e4-db15-4ef9-bbe0-8afb41546d79",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "ecb2c6bf-0ab6-418e-bd87-7986f8d63bbe": {
+    "id": "ecb2c6bf-0ab6-418e-bd87-7986f8d63bbe",
+    "displayName": "Attribute Provisioning Administrator",
+    "description": "Read and edit the provisioning configuration of all active custom security attributes for an application.",
+    "templateId": "ecb2c6bf-0ab6-418e-bd87-7986f8d63bbe",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "843318fb-79a6-4168-9e6f-aa9a07481cc4": {
+    "id": "843318fb-79a6-4168-9e6f-aa9a07481cc4",
+    "displayName": "Global Secure Access Log Reader",
+    "description": "Provides designated security personnel with read-only access to network traffic logs in Microsoft Entra Internet Access and Microsoft Entra Private Access for detailed analysis.",
+    "templateId": "843318fb-79a6-4168-9e6f-aa9a07481cc4",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9d70768a-0cbc-4b4c-aea3-2e124b2477f4": {
+    "id": "9d70768a-0cbc-4b4c-aea3-2e124b2477f4",
+    "displayName": "Organizational Data Source Administrator",
+    "description": "Set up and manage the ingestion of organizational data into Microsoft 365.",
+    "templateId": "9d70768a-0cbc-4b4c-aea3-2e124b2477f4",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "024906de-61e5-49c8-8572-40335f1e0e10": {
+    "id": "024906de-61e5-49c8-8572-40335f1e0e10",
+    "displayName": "People Administrator",
+    "description": "Manage profile photos of users and people settings for all users in the organization.",
+    "templateId": "024906de-61e5-49c8-8572-40335f1e0e10",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "2ea5ce4c-b2d8-4668-bd81-3680bd2d227a": {
+    "id": "2ea5ce4c-b2d8-4668-bd81-3680bd2d227a",
+    "displayName": "IoT Device Administrator",
+    "description": "Provision new IoT devices, manage their lifecycle, configure certificates, and manage device templates.",
+    "templateId": "2ea5ce4c-b2d8-4668-bd81-3680bd2d227a",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "0ec3f692-38d6-4d14-9e69-0377ca7797ad": {
+    "id": "0ec3f692-38d6-4d14-9e69-0377ca7797ad",
+    "displayName": "Viva Glint Tenant Administrator",
+    "description": "Manage and configure Microsoft Viva Glint settings in the Microsoft 365 admin center.",
+    "templateId": "0ec3f692-38d6-4d14-9e69-0377ca7797ad",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "78b0ccd1-afc2-4f92-9116-b41aedd09592": {
+    "id": "78b0ccd1-afc2-4f92-9116-b41aedd09592",
+    "displayName": "Places Administrator",
+    "description": "Manage all aspects of the Microsoft Places service.",
+    "templateId": "78b0ccd1-afc2-4f92-9116-b41aedd09592",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "9d3e04ba-3ee4-4d1b-a3a7-9aef423a09be": {
+    "id": "9d3e04ba-3ee4-4d1b-a3a7-9aef423a09be",
+    "displayName": "SharePoint Backup Administrator",
+    "description": "Back up and restore content (including granular restore) for SharePoint and OneDrive in Microsoft 365 Backup",
+    "templateId": "9d3e04ba-3ee4-4d1b-a3a7-9aef423a09be",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "49eb8f75-97e9-4e37-9b2b-6c3ebfcffa31": {
+    "id": "49eb8f75-97e9-4e37-9b2b-6c3ebfcffa31",
+    "displayName": "Exchange Backup Administrator",
+    "description": "Back up and restore content (including granular restore) for Exchange in Microsoft 365 Backup",
+    "templateId": "49eb8f75-97e9-4e37-9b2b-6c3ebfcffa31",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "e93e3737-fa85-474a-aee4-7d3fb86510f3": {
+    "id": "e93e3737-fa85-474a-aee4-7d3fb86510f3",
+    "displayName": "Dragon Administrator",
+    "description": "Manage all aspects of the Microsoft Dragon admin center.",
+    "templateId": "e93e3737-fa85-474a-aee4-7d3fb86510f3",
+    "isBuiltIn": true,
+    "isEnabled": true
+  },
+  "5474aa98-ea41-453b-919a-f530170c52f2": {
+    "id": "5474aa98-ea41-453b-919a-f530170c52f2",
+    "displayName": "Custom Role Example",
+    "description": null,
+    "templateId": "5474aa98-ea41-453b-919a-f530170c52f2",
+    "isBuiltIn": false,
+    "isEnabled": true
+  }
+}

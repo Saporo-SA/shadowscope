@@ -1,0 +1,7 @@
+__pycache__/
+results/
+.creds
+.cursorrules
+flask_session/
+.DS_Store
+scripts/

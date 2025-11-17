@@ -1,0 +1,736 @@
+{% extends "dashboard.html" %}
+{% from 'entraID/permission_info.html' import render_permissions %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+        --message-bg: linear-gradient(120deg, rgba(50, 50, 70, 0.8), rgba(30, 30, 45, 0.9));
+        --reply-bg: linear-gradient(120deg, rgba(60, 60, 80, 0.7), rgba(40, 40, 55, 0.8));
+        --message-radius: 12px;
+        --message-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        --reply-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        --hover-transition: all 0.2s ease-in-out;
+    }
+    body {
+        color: var(--gray-4);
+        background-color: var(--gray-1);
+        background-image: linear-gradient(45deg, rgba(18, 20, 29, 0.95), rgba(18, 20, 29, 0.98));          
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    .object-list {
+        position: relative;
+        margin-top: 20px;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+    }
+    .channel-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .channel-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+    }
+    .channel-title i {
+        color: var(--primary-1);
+        font-size: 1.2rem;
+    }
+    .channel-subtitle {
+        font-size: 0.85rem;
+        color: var(--gray-4);
+        margin-top: 4px;
+    }
+    .messages-box {
+        max-height: calc(100vh - 260px);
+        overflow: hidden;
+    }
+    .messages-container {
+        flex: 1;
+        overflow-y: auto;
+        max-height: calc(100vh - 300px);
+        padding: 16px;
+        scroll-behavior: smooth;
+    }
+    .messages-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: rgba(18, 20, 29, 0.9);
+        border-bottom: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .search-container {
+        position: relative;
+        max-width: 300px;
+        width: 100%;
+    }
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-1);
+        z-index: 10;
+    }
+    .search-input {
+        padding-left: 36px;
+        border-radius: 20px;
+        background-color: rgba(18, 20, 29, 0.6) !important;
+        color: var(--gray-4);
+        border: 1px solid rgba(255, 113, 91, 0.1) !important;
+        transition: var(--hover-transition);
+        width: 100%;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+    .search-input:focus {
+        box-shadow: 0 0 0 3px rgba(255, 113, 91, 0.2);
+        border-color: var(--primary-1) !important;
+    }
+    .search-input::placeholder {
+        color: var(--gray-4);
+        opacity: 0.6;
+    }
+    #search-items::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .message-item {
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition: var(--hover-transition);
+        padding: 3px;
+        border-radius: var(--message-radius);
+    }
+    .message-item:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+    }
+    .message-item:hover .message-actions {
+        opacity: 1;
+    }
+    .message-header {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    .message-avatar {
+        margin-right: 0.75rem;
+        background: linear-gradient(45deg, rgba(255, 113, 91, 0.2), rgba(75, 49, 179, 0.2));
+        border-radius: 50%;
+        height: 38px;
+        width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .message-avatar i {
+        color: var(--primary-1) !important;
+        font-size: 1.1rem;
+    }
+    .message-author-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .message-author {
+        font-size: 0.95rem;
+        line-height: 1.2;
+        color: var(--primary-1);
+        font-weight: 500;
+    }
+    .message-time {
+        font-size: 0.75rem;
+        line-height: 1.2;
+        color: var(--gray-4);
+        opacity: 0.8;
+        margin-top: 2px;
+    }
+    .message-content {
+        background: var(--message-bg);
+        padding: 1rem;
+        border-radius: var(--message-radius);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #ffffff;
+        box-shadow: var(--message-shadow);
+        margin-left: 3.2rem;
+        position: relative;
+        max-width: 90%;
+    }
+    .message-content a {
+        color: var(--primary-3);
+        text-decoration: none;
+        transition: var(--hover-transition);
+    }
+    .message-content a:hover {
+        text-decoration: underline;
+        color: var(--primary-2);
+    }
+    .message-content img, 
+    .message-content video {
+        max-width: 100%;
+        border-radius: 6px;
+        margin: 8px 0;
+    }
+    .message-content pre {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 8px 0;
+    }
+    .message-content code {
+        font-family: monospace;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+    .message-actions {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background: rgba(18, 20, 29, 0.95);
+        border-radius: 4px;
+        opacity: 0;
+        transition: var(--hover-transition);
+        display: flex;
+        overflow: hidden;
+    }
+    .message-action {
+        padding: 6px 8px;
+        color: var(--gray-4);
+        cursor: pointer;
+        transition: var(--hover-transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .message-action:hover {
+        background: rgba(255, 113, 91, 0.1);
+        color: white;
+    }
+    .message-replies {
+        margin-left: 3.2rem;
+        margin-top: 0.8rem;
+        position: relative;
+    }
+    .message-replies::before {
+        content: "";
+        position: absolute;
+        left: -22px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: rgba(255, 113, 91, 0.2);
+        border-radius: 1px;
+    }
+    .message-reply {
+        margin-bottom: 1rem;
+        position: relative;
+    }
+    .message-reply-avatar {
+        height: 30px;
+        width: 30px;
+        background: linear-gradient(45deg, rgba(75, 49, 179, 0.2), rgba(255, 113, 91, 0.2));
+    }
+    .message-reply-author {
+        font-size: 0.9rem;
+    }
+    .message-reply-time {
+        font-size: 0.75rem;
+    }
+    .message-reply-content {
+        background: var(--reply-bg);
+        padding: 0.75rem;
+        border-radius: var(--message-radius);
+        font-size: 0.9rem;
+        box-shadow: var(--reply-shadow);
+        margin-left: 2.5rem;
+        max-width: 85%;
+    }
+    #load-more {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        transition: var(--hover-transition);
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 180px;
+        justify-content: center;
+    }
+    #load-more:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    #load-more:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        text-align: center;
+        color: var(--gray-4);
+    }
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: rgba(255, 113, 91, 0.2);
+    }
+    .empty-state-text {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    .empty-state-subtext {
+        font-size: 0.9rem;
+        opacity: 0.7;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .spin {
+        animation: spin 1s linear infinite;
+        display: inline-block;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    .shake {
+        animation: shake 0.5s;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    .message-highlight {
+        border: 2px solid var(--primary-1);
+        background-color: rgba(255, 113, 91, 0.05);
+    }
+    @media (max-width: 768px) {
+        .messages-toolbar {
+            flex-direction: column;
+            gap: 10px;
+            align-items: stretch;
+        }
+        .search-container {
+            max-width: 100%;
+        }
+        .message-content,
+        .message-reply-content {
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="object-list">
+    <div class="content-box mb-4">
+        <div class="channel-header">
+            <a href="{{ url_for('teams.list_team_channels', team_id=team.id) }}" class="btn btn-link text-decoration-none me-2" title="Back to Channels">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <div class="channel-title">
+                    <i class="bi bi-hash"></i>
+                    <span>{{ channel.displayName }}</span>
+                </div>
+                <div class="channel-subtitle">
+                    Team: {{ team.displayName }}
+                    {% if total_messages is defined %}
+                    <span style="margin-left: 10px; color: var(--primary-3);">
+                        • {{ total_messages }} message{{ 's' if total_messages != 1 else '' }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="ps-3 pe-3 pb-2 pt-2">
+            {{ render_permissions('teams', module_permissions) }}
+        </div>
+    </div>
+
+    <div class="content-box messages-box">
+        <div class="messages-toolbar">
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="form-control search-input" 
+                       id="search-items" placeholder="Search messages...">
+            </div>
+            <button id="load-more" {% if not has_more %}disabled{% endif %}>
+                <i class="bi bi-arrow-down"></i> Load More Messages
+            </button>
+        </div>
+        <div class="messages-container" id="messages-container">
+            <div class="messages-list">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="message-item fade-in" data-message-id="{{ message.id }}">
+                        <div class="message-actions">
+                            <div class="message-action copy-link" title="Copy link to message">
+                                <i class="bi bi-link-45deg"></i>
+                            </div>
+                            <div class="message-action bookmark" title="Bookmark message">
+                                <i class="bi bi-bookmark"></i>
+                            </div>
+                        </div>
+                        <div class="message-header">
+                            <div class="message-avatar">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="message-author-info">
+                                <div class="message-author">{{ message.from.user.displayName if message.from and message.from.user else 'Unknown' }}</div>
+                                <div class="message-time">{{ message.createdDateTime or 'No date' }}</div>
+                            </div>
+                        </div>
+                        <div class="message-content">
+                            {{ message.body.content|safe if message.body else 'No content' }}
+                        </div>
+                        {% if message.replies %}
+                        <div class="message-replies">
+                            {% for reply in message.replies %}
+                            <div class="message-reply fade-in" data-reply-id="{{ reply.id }}">
+                                <div class="message-header">
+                                    <div class="message-avatar message-reply-avatar">
+                                        <i class="bi bi-reply-fill"></i>
+                                    </div>
+                                    <div class="message-author-info">
+                                        <div class="message-author message-reply-author">{{ reply.from.user.displayName if reply.from and reply.from.user else 'Unknown' }}</div>
+                                        <div class="message-time message-reply-time">{{ reply.createdDateTime or 'No date' }}</div>
+                                    </div>
+                                </div>
+                                <div class="message-reply-content">
+                                    {{ reply.body.content|safe if reply.body else 'No content' }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="bi bi-chat-square-text"></i>
+                        </div>
+                        <div class="empty-state-text">No messages found in this channel</div>
+                        <div class="empty-state-subtext">This channel has no messages yet or you may not have permission to view them.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    const messagesList = document.querySelector('.messages-list');
+    const messagesContainer = document.getElementById('messages-container');
+    const loadMoreButton = document.getElementById('load-more');
+    
+    // Scroll to the bottom of messages when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        if (messagesContainer) {
+            messagesContainer.scrollTop = 0;
+        }
+    });
+    
+    // Function to show loading state
+    function showLoading() {
+        loadMoreButton.disabled = true;
+        loadMoreButton.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Loading...';
+    }
+    
+    // Function to show error state
+    function showError(errorMsg) {
+        loadMoreButton.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error loading';
+        loadMoreButton.disabled = false;
+        
+        // Add shake animation
+        loadMoreButton.classList.add('shake');
+        setTimeout(() => loadMoreButton.classList.remove('shake'), 500);
+        
+        // Restore button after a delay
+        setTimeout(() => {
+            resetButton();
+        }, 3000);
+    }
+    
+    // Function to reset button
+    function resetButton() {
+        loadMoreButton.disabled = false;
+        loadMoreButton.innerHTML = '<i class="bi bi-arrow-down"></i> Load More Messages';
+    }
+    
+    // Function to show no more messages
+    function showNoMore() {
+        loadMoreButton.disabled = true;
+        loadMoreButton.innerHTML = '<i class="bi bi-check2-circle"></i> No More Messages';
+    }
+    
+    // Load more messages
+    loadMoreButton.addEventListener('click', async () => {
+        currentPage++;
+        showLoading();
+        
+        try {
+            const url = new URL(window.location.href);
+            url.searchParams.set('page', currentPage);
+            url.searchParams.set('limit', 10);
+            
+            const response = await fetch(url.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to load messages');
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to load messages');
+            }
+            
+            if (data.messages && data.messages.length > 0) {
+                data.messages.forEach(message => {
+                    const messageHtml = createMessageElement(message);
+                    messagesList.insertAdjacentHTML('beforeend', messageHtml);
+                });
+                
+                if (data.has_more) {
+                    resetButton();
+                } else {
+                    showNoMore();
+                }
+                
+                initializeMessageActions();
+            } else {
+                showNoMore();
+            }
+            
+        } catch (error) {
+            currentPage--;
+            showError(error.message);
+        }
+    });
+    
+    function createMessageElement(message) {
+        const author = message.from?.user?.displayName || 'Unknown';
+        const time = message.createdDateTime || 'No date';
+        const content = message.body?.content || 'No content';
+        const messageId = message.id;
+        
+        let repliesHtml = '';
+        if (message.replies && message.replies.length > 0) {
+            repliesHtml = '<div class="message-replies">';
+            message.replies.forEach(reply => {
+                const replyAuthor = reply.from?.user?.displayName || 'Unknown';
+                const replyTime = reply.createdDateTime || 'No date';
+                const replyContent = reply.body?.content || 'No content';
+                const replyId = reply.id;
+                
+                repliesHtml += `
+                    <div class="message-reply fade-in" data-reply-id="${replyId}">
+                        <div class="message-header">
+                            <div class="message-avatar message-reply-avatar">
+                                <i class="bi bi-reply-fill"></i>
+                            </div>
+                            <div class="message-author-info">
+                                <div class="message-author message-reply-author">${replyAuthor}</div>
+                                <div class="message-time message-reply-time">${replyTime}</div>
+                            </div>
+                        </div>
+                        <div class="message-reply-content">${replyContent}</div>
+                    </div>
+                `;
+            });
+            repliesHtml += '</div>';
+        }
+        
+        return `
+            <div class="message-item fade-in" data-message-id="${messageId}">
+                <div class="message-actions">
+                    <div class="message-action copy-link" title="Copy link to message">
+                        <i class="bi bi-link-45deg"></i>
+                    </div>
+                    <div class="message-action bookmark" title="Bookmark message">
+                        <i class="bi bi-bookmark"></i>
+                    </div>
+                </div>
+                <div class="message-header">
+                    <div class="message-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="message-author-info">
+                        <div class="message-author">${author}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                </div>
+                <div class="message-content">${content}</div>
+                ${repliesHtml}
+            </div>
+        `;
+    }
+    
+    function initializeMessageActions() {
+        document.querySelectorAll('.copy-link').forEach(button => {
+            button.removeEventListener('click', handleCopyLink);
+            button.addEventListener('click', handleCopyLink);
+        });
+        
+        document.querySelectorAll('.bookmark').forEach(button => {
+            button.removeEventListener('click', handleBookmark);
+            button.addEventListener('click', handleBookmark);
+        });
+    }
+    
+    function handleCopyLink(e) {
+        const messageItem = this.closest('.message-item');
+        const messageId = messageItem.dataset.messageId;
+        const messageLink = `${window.location.origin}${window.location.pathname}?messageId=${messageId}`;
+        
+        navigator.clipboard.writeText(messageLink).then(() => {
+            this.innerHTML = '<i class="bi bi-check"></i>';
+            setTimeout(() => {
+                this.innerHTML = '<i class="bi bi-link-45deg"></i>';
+            }, 2000);
+        }).catch(err => {
+            this.innerHTML = '<i class="bi bi-x"></i>';
+            setTimeout(() => {
+                this.innerHTML = '<i class="bi bi-link-45deg"></i>';
+            }, 2000);
+        });
+    }
+    
+    function handleBookmark(e) {
+        this.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
+        const messageItem = this.closest('.message-item');
+        messageItem.classList.add('message-highlight');
+        
+        setTimeout(() => {
+            messageItem.classList.remove('message-highlight');
+        }, 1000);
+    }
+
+    // Enhanced search functionality with highlighting
+    document.getElementById('search-items').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        let matchCount = 0;
+        
+        document.querySelectorAll('.message-item').forEach(messageItem => {
+            const author = messageItem.querySelector('.message-author').textContent.toLowerCase();
+            const time = messageItem.querySelector('.message-time').textContent.toLowerCase();
+            const content = messageItem.querySelector('.message-content').textContent.toLowerCase();
+            
+            // Remove any previous highlights
+            messageItem.classList.remove('message-highlight');
+            
+            if (searchTerm === '') {
+                messageItem.style.display = '';
+                return;
+            }
+            
+            if (author.includes(searchTerm) || time.includes(searchTerm) || content.includes(searchTerm)) {
+                messageItem.style.display = '';
+                // Add highlight to matching messages
+                messageItem.classList.add('message-highlight');
+                matchCount++;
+            } else {
+                // Also check replies
+                let foundInReplies = false;
+                const replies = messageItem.querySelectorAll('.message-reply');
+                
+                replies.forEach(reply => {
+                    const replyAuthor = reply.querySelector('.message-reply-author').textContent.toLowerCase();
+                    const replyTime = reply.querySelector('.message-reply-time').textContent.toLowerCase();
+                    const replyContent = reply.querySelector('.message-reply-content').textContent.toLowerCase();
+                    
+                    if (replyAuthor.includes(searchTerm) || replyTime.includes(searchTerm) || replyContent.includes(searchTerm)) {
+                        foundInReplies = true;
+                        reply.classList.add('message-highlight');
+                    } else {
+                        reply.classList.remove('message-highlight');
+                    }
+                });
+                
+                if (foundInReplies) {
+                    messageItem.style.display = '';
+                    matchCount++;
+                } else {
+                    messageItem.style.display = 'none';
+                }
+            }
+        });
+        
+        // Update the button text to show match count
+        if (searchTerm !== '') {
+            loadMoreButton.innerHTML = `<i class="bi bi-search"></i> ${matchCount} ${matchCount === 1 ? 'Match' : 'Matches'} Found`;
+            loadMoreButton.disabled = true;
+        } else {
+            resetButton();
+            // If there are no more messages to load
+            if (!{{ has_more|tojson }}) {
+                showNoMore();
+            }
+        }
+    });
+    
+    // Initialize message actions for existing messages
+    initializeMessageActions();
+</script>
+{% endblock %}

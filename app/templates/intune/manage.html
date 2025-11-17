@@ -1,0 +1,1278 @@
+{% extends "dashboard.html" %}
+{% from 'entraID/permission_info.html' import render_permissions %}
+
+{% block dynamic_content %}
+<style>
+    :root {
+        --white: white;
+        --primary-6: #8f2df0;
+        --primary-3: #3ccf91;
+        --gray-3: #ffffff1a;
+        --primary-2: #ff934f;
+        --primary-1: #ff715b;
+        --primary-4: #3c5ccf;
+        --primary-5: #5132c0;
+        --gray-1: #12141d;
+        --gray-4: #ffffff80;
+        --gray-2: #ffffff0d;
+        --black: black;
+    }
+    .module-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: auto;
+    }
+    .content-box {
+        background: rgba(18, 20, 29, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        color: var(--gray-4);
+    }
+    .table-standard {
+        font-size: 0.85rem;
+    }
+    .table-standard td {
+        padding: 0.4rem 0.6rem;
+        height: 36px;
+        line-height: 1.2;
+    }
+    .table-standard th {
+        padding: 0.5rem 0.6rem;
+        height: 38px;
+        font-size: 0.75rem;
+    }
+    #data-table.table {
+        --bs-table-bg: rgba(18, 20, 29, 0.8) !important;
+        --bs-table-color: var(--gray-4) !important;
+        --bs-table-border-color: rgba(255, 113, 91, 0.1) !important;
+    }
+    .table {
+        --bs-table-hover-bg: rgba(255, 113, 91, 0.05);
+        margin-bottom: 0;
+        background: rgba(18, 20, 29, 0.8);
+        color: var(--gray-4);
+        table-layout: fixed;
+        width: 100%;
+    }
+    .table-responsive {
+        position: relative;
+        overflow-y: auto;
+        max-height: 600px;
+        min-height: 400px;
+    }
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: rgba(18, 20, 29, 0.9);
+    }
+    .table th {
+        position: sticky;
+        top: 0;
+        background: rgba(18, 20, 29, 0.9);
+        z-index: 1;
+        color: var(--primary-1);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 0.5rem 0.6rem;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.2);
+        height: 38px;
+    }
+    .table td {
+        padding: 0.4rem 0.6rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+        height: 36px;
+    }
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        border: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--primary-2), var(--primary-1));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 113, 91, 0.2);
+    }
+    .btn-outline-primary {
+        color: var(--primary-1);
+        border-color: var(--primary-1);
+        background-color: transparent;
+    }
+    .btn-outline-primary:hover {
+        background: var(--primary-1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(255, 113, 91, 0.3);
+    }
+    .script-content {
+        background: rgba(18, 20, 29, 0.9);
+        border: 1px solid rgba(255, 113, 91, 0.2);
+        border-radius: 6px;
+        padding: 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: var(--gray-4);
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.3em 0.6em;
+        font-size: 0.75rem;
+    }
+    .input-group {
+        border-radius: 6px;
+    }
+    .input-group .form-control {
+        padding: 0.4rem 0.75rem;
+    }
+    #search-items::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .info-panel {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .modal-content {
+        background: rgba(18, 20, 29, 0.95);
+        border: 1px solid transparent;
+        border-image: linear-gradient(45deg, #ff715b 0%, rgba(75, 49, 179, 1) 100%);
+        border-image-slice: 1;
+        color: var(--white);
+        border-radius: 12px;
+    }
+    .modal-header {
+        background: linear-gradient(45deg, var(--primary-1), var(--primary-2));
+        color: white;
+        border-bottom: none;
+    }
+    .modal-footer {
+        border-top: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .modal-dialog {
+        margin: 1.75rem auto;
+    }
+    .modal {
+        z-index: 1300 !important;
+    }
+    .modal-backdrop {
+        z-index: 1290 !important;
+    }
+    .spin {
+        animation: spin 1s linear infinite;
+        display: inline-block;
+    }
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    #script-content-editor {
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        min-height: 180px;
+        max-height: 250px;
+        background-color: rgba(18, 20, 29, 0.8);
+        color: var(--gray-4);
+        border: 1px solid rgba(255, 113, 91, 0.1);
+        resize: vertical;
+        line-height: 1.4;
+    }
+    #scriptModal .modal-header {
+        padding: 0.75rem 1rem;
+    }
+    #scriptModal .modal-body {
+        max-height: calc(100vh - 250px);
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    #scriptModal .modal-footer {
+        padding: 0.75rem 1rem;
+    }
+    #scriptModal .modal-body .form-label {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+    }
+    #scriptModal .modal-body .form-control {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+    #scriptModal .modal-body .mb-2 {
+        margin-bottom: 0.75rem !important;
+    }
+    #scriptModal .modal-body .mb-3 {
+        margin-bottom: 0.75rem !important;
+    }
+    .device-selector {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 113, 91, 0.1);
+        border-radius: 6px;
+        padding: 0.5rem;
+    }
+    .device-checkbox {
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem 0;
+    }
+</style>
+
+<div class="module-container">
+    <div class="content-box mb-2 info-panel">
+        <div class="d-flex justify-content-between align-items-center p-2">
+            <h5 class="mb-0 ps-2" style="font-size: 0.95rem;">
+                <i class="bi bi-code-slash" style="color: var(--primary-1);"></i> Intune Scripts
+            </h5>
+            <div class="d-flex gap-2 align-items-center">
+                {% if access.intune.features.get('windows_macos_scripts', False) or access.intune.features.get('linux_scripts', False) %}
+                <button id="create-script-btn" class="btn btn-primary py-1 px-2" style="font-size: 0.8rem; height: 28px;">
+                    <i class="bi bi-plus-circle"></i> Create Script
+                </button>
+                {% endif %}
+                <button id="refresh-scripts-btn" class="btn btn-outline-primary py-1 px-2" style="font-size: 0.8rem; height: 28px;">
+                    <i class="bi bi-arrow-repeat"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="ps-2 pe-2 pb-1" style="font-size: 0.8rem;">
+            {{ render_permissions('intune', module_permissions) }}
+        </div>
+    </div>
+
+    <div class="content-box table-box">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0" style="background: var(--gray-1)">
+                <div class="p-2 border-bottom" style="background: rgba(18, 20, 29, 0.8); border-bottom: 1px solid rgba(255, 113, 91, 0.1);">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 py-1 px-2">
+                            <i class="bi bi-search" style="color: var(--primary-1);"></i>
+                        </span>
+                        <input type="text" class="form-control border-0 bg-transparent py-1" id="search-items"
+                            placeholder="Search scripts..." style="
+                                    background-color: rgba(18, 20, 29, 0.6) !important;
+                                    color: var(--gray-4);
+                                    border: 1px solid rgba(255, 113, 91, 0.1) !important;
+                                    height: 32px;
+                               ">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="data-table" class="table table-hover table-standard mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Last Modified</th>
+                                <th>Device Status</th>
+                                <th>User Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scripts-tbody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="alert alert-info mb-0">
+                                        Loading scripts...
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="scriptModal" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scriptModalTitle">Create Script</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="script-form">
+                    <input type="hidden" id="script-id" value="">
+                    <div class="row mb-2">
+                        <div class="col-md-4 mb-2">
+                            <label for="script-name" class="form-label">Script Name</label>
+                            <input type="text" class="form-control" id="script-name" required
+                                style="background-color: rgba(18, 20, 29, 0.8); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.1);">
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="script-platform" class="form-label">Platform</label>
+                            <select class="form-control" id="script-platform"
+                                style="background-color: rgba(18, 20, 29, 0.8); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.1);">
+                                {% if access.intune.features.get('windows_macos_scripts', False) %}
+                                <option value="Windows">Windows</option>
+                                <option value="macOS">macOS</option>
+                                {% endif %}
+                                {% if access.intune.features.get('linux_scripts', False) %}
+                                <option value="Linux">Linux</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label for="script-type" class="form-label">Script Type</label>
+                            <select class="form-control" id="script-type"
+                                style="background-color: rgba(18, 20, 29, 0.8); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.1);">
+                                <option value="PowerShell">PowerShell</option>
+                                <option value="Shell">Shell</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label for="script-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="script-description" rows="1"
+                            style="background-color: rgba(18, 20, 29, 0.8); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.1); resize: vertical;"></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label for="script-content-editor" class="form-label">Script Content</label>
+                        <textarea class="form-control" id="script-content-editor" required></textarea>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-2">
+                            <label for="run-as-account" class="form-label">Run As Account</label>
+                            <select class="form-control" id="run-as-account"
+                                style="background-color: rgba(18, 20, 29, 0.8); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.1);">
+                                <option value="system">System</option>
+                                <option value="user">User</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <label class="form-label d-block" style="margin-bottom: 0.5rem;">Options</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enforce-signature-check">
+                                    <label class="form-check-label" for="enforce-signature-check" style="font-size: 0.85rem;">
+                                        Enforce Signature Check
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="run-as32bit">
+                                    <label class="form-check-label" for="run-as32bit" style="font-size: 0.85rem;">
+                                        Run as 32-bit
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="border-color: rgba(255, 113, 91, 0.1); margin: 1rem 0;">
+                    <div class="mb-2" id="assignments-section" style="display: none;">
+                        <label class="form-label">Assignments</label>
+                        <div class="mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="scriptAssignmentType" id="scriptAssignmentAllDevices" value="all_devices">
+                                <label class="form-check-label" for="scriptAssignmentAllDevices">
+                                    All Devices
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="scriptAssignmentType" id="scriptAssignmentSelectGroups" value="select_groups">
+                                <label class="form-check-label" for="scriptAssignmentSelectGroups">
+                                    Select Groups
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="scriptAssignmentType" id="scriptAssignmentAllUsers" value="all_users">
+                                <label class="form-check-label" for="scriptAssignmentAllUsers">
+                                    All Users
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-2" id="script-group-select-container" style="display: none;">
+                            <label for="script-group-select" class="form-label">Select Group:</label>
+                            <select class="form-control" id="script-group-select"
+                                style="background-color: rgba(18, 20, 29, 0.8); color: var(--gray-4); border: 1px solid rgba(255, 113, 91, 0.1);">
+                                <option value="">-- Loading groups... --</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-script-btn">Save Script</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let scripts = null;
+    let isLoadingScripts = false;
+    let currentScriptId = null;
+    let devices = {{ devices|tojson|safe }};
+
+    function showStatus(message, type = 'success') {
+        if (typeof ShadowScopeNotifications !== 'undefined') {
+            ShadowScopeNotifications.show(message, type);
+        } else {
+            alert(message);
+        }
+    }
+
+    async function loadScripts() {
+        if (isLoadingScripts) {
+            return;
+        }
+        
+        isLoadingScripts = true;
+        const tbody = document.getElementById('scripts-tbody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4">
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-arrow-repeat spin"></i> Loading scripts...
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        try {
+            const response = await fetch('/intune/manage/scripts', {
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to load scripts');
+            }
+            
+            scripts = await response.json();
+            isLoadingScripts = false;
+            renderScripts();
+            loadScriptStatuses();
+        } catch (error) {
+            isLoadingScripts = false;
+            showStatus(`Error loading scripts: ${error.message}`, 'error');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="alert alert-danger mb-0">
+                            Failed to load scripts. Please try again.
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    function renderScripts() {
+        if (scripts === null) {
+            return;
+        }
+        
+        const tbody = document.getElementById('scripts-tbody');
+        
+        if (scripts.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="alert alert-info mb-0">
+                            No scripts found. Create your first script to get started.
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        const canManageScripts = {{ 'true' if (access.intune.features.get('windows_macos_scripts', False) or access.intune.features.get('linux_scripts', False)) else 'false' }};
+        
+        tbody.innerHTML = scripts.map(script => {
+            const scriptType = script.scriptType || (script.fileName && script.fileName.endsWith('.ps1') ? 'PowerShell' : 'Shell');
+            const platform = script.platform || (scriptType === 'PowerShell' ? 'Windows' : 'Linux');
+            const lastModified = script.lastModifiedDateTime ? new Date(script.lastModifiedDateTime).toLocaleDateString() : 'N/A';
+            const description = script.description || 'No description';
+            const scriptName = escapeHtml(script.displayName || 'Unnamed');
+            
+            let platformIcon = 'bi-file-code';
+            let platformColor = 'var(--primary-1)';
+            if (platform === 'Windows') {
+                platformIcon = 'bi-windows';
+                platformColor = '#0078d4';
+            } else if (platform === 'Linux') {
+                platformIcon = 'bi-ubuntu';
+                platformColor = '#e95420';
+            } else if (platform === 'macOS') {
+                platformIcon = 'bi-apple';
+                platformColor = '#86868b';
+            }
+            
+            let actionsHtml = '<div class="d-flex gap-2">';
+            if (canManageScripts) {
+                actionsHtml += `
+                    <button type="button" class="btn btn-sm btn-primary edit-script py-0 px-2" style="font-size: 0.75rem; height: 24px;" 
+                        data-script-id="${script.id}" title="Edit script">
+                        <i class="bi bi-pencil" style="font-size: 0.75rem"></i> Edit
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger delete-script py-0 px-2" style="font-size: 0.75rem; height: 24px;" 
+                        data-script-id="${script.id}" title="Delete script">
+                        <i class="bi bi-trash" style="font-size: 0.75rem"></i>
+                    </button>
+                `;
+            }
+            actionsHtml += '</div>';
+            
+            let badgeText = scriptType;
+            if (platform === 'Windows') {
+                badgeText = 'Windows PowerShell';
+            } else if (platform === 'Linux') {
+                badgeText = 'Linux Shell';
+            } else if (platform === 'macOS') {
+                badgeText = 'macOS Shell';
+            }
+            
+            return `
+                <tr class="item-row" data-script-id="${script.id}">
+                    <td>
+                        <i class="bi ${platformIcon} me-2" style="color: ${platformColor};"></i>
+                        <span class="text-white">${scriptName}</span>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: rgba(113, 115, 251, 0.2); color: #7173fb;">
+                            ${badgeText}
+                        </span>
+                    </td>
+                    <td>${escapeHtml(description)}</td>
+                    <td>${lastModified}</td>
+                    <td>
+                        <div class="script-device-status" data-script-id="${script.id}">
+                            <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                                <i class="bi bi-hourglass-split"></i> Checking...
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="script-user-status" data-script-id="${script.id}">
+                            <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                                <i class="bi bi-hourglass-split"></i> Checking...
+                            </span>
+                        </div>
+                    </td>
+                    <td>${actionsHtml}</td>
+                </tr>
+            `;
+        }).join('');
+
+        attachEventListeners();
+    }
+
+    async function loadScriptStatuses() {
+        if (!scripts || scripts.length === 0) {
+            return;
+        }
+
+        const statusPromises = scripts.map(async (script) => {
+            const deviceStatusElement = document.querySelector(`.script-device-status[data-script-id="${script.id}"]`);
+            const userStatusElement = document.querySelector(`.script-user-status[data-script-id="${script.id}"]`);
+            
+            if (!deviceStatusElement || !userStatusElement) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/intune/manage/scripts/${script.id}/run-summary`, {
+                    credentials: 'same-origin'
+                });
+
+                if (response.status === 404) {
+                    deviceStatusElement.innerHTML = `
+                        <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                            <i class="bi bi-dash-circle"></i> Not Executed
+                        </span>
+                    `;
+                    userStatusElement.innerHTML = `
+                        <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                            <i class="bi bi-dash-circle"></i> Not Executed
+                        </span>
+                    `;
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const runSummary = await response.json();
+                const successDeviceCount = runSummary.successDeviceCount || 0;
+                const errorDeviceCount = runSummary.errorDeviceCount || 0;
+                const successUserCount = runSummary.successUserCount || 0;
+                const errorUserCount = runSummary.errorUserCount || 0;
+
+                let deviceTimestampHtml = '';
+                let userTimestampHtml = '';
+                
+                if (runSummary.lastExecutionDateTime) {
+                    try {
+                        const execDate = new Date(runSummary.lastExecutionDateTime);
+                        const formattedDate = execDate.toLocaleString();
+                        deviceTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${formattedDate}</div>`;
+                        userTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${formattedDate}</div>`;
+                    } catch (e) {
+                        const timestamp = runSummary.lastExecutionDateTime;
+                        deviceTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${timestamp}</div>`;
+                        userTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${timestamp}</div>`;
+                    }
+                }
+
+                if (successDeviceCount > 0 && errorDeviceCount === 0) {
+                    deviceStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: #3ccf91;" title="Success: ${successDeviceCount} device(s)">
+                                <i class="bi bi-check-circle-fill"></i> Success (${successDeviceCount})
+                            </span>
+                            ${deviceTimestampHtml}
+                        </div>
+                    `;
+                } else if (errorDeviceCount > 0 && successDeviceCount === 0) {
+                    deviceStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(255, 59, 48, 0.2); color: #ff3b30;" title="Errors: ${errorDeviceCount} device(s)">
+                                <i class="bi bi-x-circle-fill"></i> Error (${errorDeviceCount})
+                            </span>
+                            ${deviceTimestampHtml}
+                        </div>
+                    `;
+                } else if (successDeviceCount > 0 || errorDeviceCount > 0) {
+                    deviceStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(255, 149, 0, 0.2); color: #ff9500;" title="Success: ${successDeviceCount}, Errors: ${errorDeviceCount}">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Partial (${successDeviceCount}/${errorDeviceCount})
+                            </span>
+                            ${deviceTimestampHtml}
+                        </div>
+                    `;
+                } else {
+                    deviceStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                                <i class="bi bi-dash-circle"></i> Not Executed
+                            </span>
+                            ${deviceTimestampHtml}
+                        </div>
+                    `;
+                }
+
+                if (successUserCount > 0 && errorUserCount === 0) {
+                    userStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: #3ccf91;" title="Success: ${successUserCount} user(s)">
+                                <i class="bi bi-check-circle-fill"></i> Success (${successUserCount})
+                            </span>
+                            ${userTimestampHtml}
+                        </div>
+                    `;
+                } else if (errorUserCount > 0 && successUserCount === 0) {
+                    userStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(255, 59, 48, 0.2); color: #ff3b30;" title="Errors: ${errorUserCount} user(s)">
+                                <i class="bi bi-x-circle-fill"></i> Error (${errorUserCount})
+                            </span>
+                            ${userTimestampHtml}
+                        </div>
+                    `;
+                } else if (successUserCount > 0 || errorUserCount > 0) {
+                    userStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(255, 149, 0, 0.2); color: #ff9500;" title="Success: ${successUserCount}, Errors: ${errorUserCount}">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Partial (${successUserCount}/${errorUserCount})
+                            </span>
+                            ${userTimestampHtml}
+                        </div>
+                    `;
+                } else {
+                    userStatusElement.innerHTML = `
+                        <div>
+                            <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                                <i class="bi bi-dash-circle"></i> Not Executed
+                            </span>
+                            ${userTimestampHtml}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                deviceStatusElement.innerHTML = `
+                    <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                        <i class="bi bi-question-circle"></i> Unknown
+                    </span>
+                `;
+                userStatusElement.innerHTML = `
+                    <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                        <i class="bi bi-question-circle"></i> Unknown
+                    </span>
+                `;
+            }
+        });
+
+        await Promise.all(statusPromises);
+    }
+
+    async function updateScriptStatus(scriptId) {
+        const deviceStatusElement = document.querySelector(`.script-device-status[data-script-id="${scriptId}"]`);
+        const userStatusElement = document.querySelector(`.script-user-status[data-script-id="${scriptId}"]`);
+        
+        if (!deviceStatusElement || !userStatusElement) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/intune/manage/scripts/${scriptId}/run-summary`, {
+                credentials: 'same-origin'
+            });
+
+            if (response.status === 404) {
+                deviceStatusElement.innerHTML = `
+                    <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                        <i class="bi bi-dash-circle"></i> Not Executed
+                    </span>
+                `;
+                userStatusElement.innerHTML = `
+                    <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                        <i class="bi bi-dash-circle"></i> Not Executed
+                    </span>
+                `;
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const runSummary = await response.json();
+            const successDeviceCount = runSummary.successDeviceCount || 0;
+            const errorDeviceCount = runSummary.errorDeviceCount || 0;
+            const successUserCount = runSummary.successUserCount || 0;
+            const errorUserCount = runSummary.errorUserCount || 0;
+
+            let deviceTimestampHtml = '';
+            let userTimestampHtml = '';
+            
+            if (runSummary.lastExecutionDateTime) {
+                try {
+                    const execDate = new Date(runSummary.lastExecutionDateTime);
+                    const formattedDate = execDate.toLocaleString();
+                    deviceTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${formattedDate}</div>`;
+                    userTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${formattedDate}</div>`;
+                } catch (e) {
+                    const timestamp = runSummary.lastExecutionDateTime;
+                    deviceTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${timestamp}</div>`;
+                    userTimestampHtml = `<div style="font-size: 0.65rem; color: var(--gray-med); margin-top: 0.25rem;">${timestamp}</div>`;
+                }
+            }
+
+            if (successDeviceCount > 0 && errorDeviceCount === 0) {
+                deviceStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: #3ccf91;" title="Success: ${successDeviceCount} device(s)">
+                            <i class="bi bi-check-circle-fill"></i> Success (${successDeviceCount})
+                        </span>
+                        ${deviceTimestampHtml}
+                    </div>
+                `;
+            } else if (errorDeviceCount > 0 && successDeviceCount === 0) {
+                deviceStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(255, 59, 48, 0.2); color: #ff3b30;" title="Errors: ${errorDeviceCount} device(s)">
+                            <i class="bi bi-x-circle-fill"></i> Error (${errorDeviceCount})
+                        </span>
+                        ${deviceTimestampHtml}
+                    </div>
+                `;
+            } else if (successDeviceCount > 0 || errorDeviceCount > 0) {
+                deviceStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(255, 149, 0, 0.2); color: #ff9500;" title="Success: ${successDeviceCount}, Errors: ${errorDeviceCount}">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Partial (${successDeviceCount}/${errorDeviceCount})
+                        </span>
+                        ${deviceTimestampHtml}
+                    </div>
+                `;
+            } else {
+                deviceStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                            <i class="bi bi-dash-circle"></i> Not Executed
+                        </span>
+                        ${deviceTimestampHtml}
+                    </div>
+                `;
+            }
+
+            if (successUserCount > 0 && errorUserCount === 0) {
+                userStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(60, 207, 145, 0.2); color: #3ccf91;" title="Success: ${successUserCount} user(s)">
+                            <i class="bi bi-check-circle-fill"></i> Success (${successUserCount})
+                        </span>
+                        ${userTimestampHtml}
+                    </div>
+                `;
+            } else if (errorUserCount > 0 && successUserCount === 0) {
+                userStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(255, 59, 48, 0.2); color: #ff3b30;" title="Errors: ${errorUserCount} user(s)">
+                            <i class="bi bi-x-circle-fill"></i> Error (${errorUserCount})
+                        </span>
+                        ${userTimestampHtml}
+                    </div>
+                `;
+            } else if (successUserCount > 0 || errorUserCount > 0) {
+                userStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(255, 149, 0, 0.2); color: #ff9500;" title="Success: ${successUserCount}, Errors: ${errorUserCount}">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Partial (${successUserCount}/${errorUserCount})
+                        </span>
+                        ${userTimestampHtml}
+                    </div>
+                `;
+            } else {
+                userStatusElement.innerHTML = `
+                    <div>
+                        <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                            <i class="bi bi-dash-circle"></i> Not Executed
+                        </span>
+                        ${userTimestampHtml}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            deviceStatusElement.innerHTML = `
+                <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                    <i class="bi bi-question-circle"></i> Unknown
+                </span>
+            `;
+            userStatusElement.innerHTML = `
+                <span class="badge" style="background: rgba(128, 128, 128, 0.2); color: #808080;">
+                    <i class="bi bi-question-circle"></i> Unknown
+                </span>
+            `;
+        }
+    }
+
+    function attachEventListeners() {
+
+        document.querySelectorAll('.edit-script').forEach(button => {
+            button.addEventListener('click', () => {
+                const scriptId = button.dataset.scriptId;
+                editScript(scriptId);
+            });
+        });
+
+        document.querySelectorAll('.delete-script').forEach(button => {
+            button.addEventListener('click', () => {
+                const scriptId = button.dataset.scriptId;
+                deleteScript(scriptId);
+            });
+        });
+
+    }
+
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function resetAssignmentsSection() {
+        document.querySelectorAll('input[name="scriptAssignmentType"]').forEach(radio => {
+            radio.checked = false;
+        });
+        const assignmentsSection = document.getElementById('assignments-section');
+        const scriptGroupSelectContainer = document.getElementById('script-group-select-container');
+        const scriptGroupSelect = document.getElementById('script-group-select');
+        assignmentsSection.style.display = 'none';
+        scriptGroupSelectContainer.style.display = 'none';
+        scriptGroupSelect.value = '';
+        scriptGroupSelect.innerHTML = '<option value="">-- Loading groups... --</option>';
+    }
+    
+    function handleScriptAssignmentTypeChange() {
+        const scriptGroupSelectContainer = document.getElementById('script-group-select-container');
+        const scriptGroupSelect = document.getElementById('script-group-select');
+        const selectedType = document.querySelector('input[name="scriptAssignmentType"]:checked')?.value;
+        
+        if (selectedType === 'select_groups') {
+            scriptGroupSelectContainer.style.display = 'block';
+            if (scriptGroupSelect.options.length === 1 && scriptGroupSelect.options[0].value === '') {
+                loadGroupsForScript();
+            }
+        } else {
+            scriptGroupSelectContainer.style.display = 'none';
+            scriptGroupSelect.value = '';
+        }
+    }
+    
+    function updateScriptTypeFields() {
+        const scriptPlatform = document.getElementById('script-platform').value;
+        const scriptType = document.getElementById('script-type').value;
+        const isPowerShell = scriptType === 'PowerShell' && scriptPlatform === 'Windows';
+        const enforceSignatureCheck = document.getElementById('enforce-signature-check');
+        const runAs32bit = document.getElementById('run-as32bit');
+        
+        enforceSignatureCheck.disabled = !isPowerShell;
+        runAs32bit.disabled = !isPowerShell;
+        
+        if (!isPowerShell) {
+            enforceSignatureCheck.checked = false;
+            runAs32bit.checked = false;
+        }
+        
+        if (scriptPlatform === 'Windows') {
+            document.getElementById('script-type').value = 'PowerShell';
+            document.getElementById('script-type').disabled = true;
+        } else {
+            document.getElementById('script-type').value = 'Shell';
+            document.getElementById('script-type').disabled = true;
+        }
+    }
+    
+    function showCreateModal() {
+        currentScriptId = null;
+        document.getElementById('scriptModalTitle').textContent = 'Create Script';
+        document.getElementById('script-id').value = '';
+        document.getElementById('script-name').value = '';
+        document.getElementById('script-description').value = '';
+        
+        const platformSelect = document.getElementById('script-platform');
+        const firstAvailablePlatform = platformSelect.options[0] ? platformSelect.options[0].value : 'Windows';
+        platformSelect.value = firstAvailablePlatform;
+        
+        document.getElementById('script-type').value = 'PowerShell';
+        document.getElementById('script-content-editor').value = '';
+        document.getElementById('run-as-account').value = 'system';
+        document.getElementById('enforce-signature-check').checked = false;
+        document.getElementById('run-as32bit').checked = false;
+        document.getElementById('script-type').disabled = false;
+        document.getElementById('script-platform').disabled = false;
+        updateScriptTypeFields();
+        
+        resetAssignmentsSection();
+        
+        document.querySelectorAll('input[name="scriptAssignmentType"]').forEach(radio => {
+            radio.onchange = handleScriptAssignmentTypeChange;
+        });
+        
+        const modal = new bootstrap.Modal(document.getElementById('scriptModal'));
+        modal.show();
+    }
+
+    async function editScript(scriptId) {
+        try {
+            const response = await fetch(`/intune/manage/scripts/${scriptId}`, {
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to load script');
+            }
+            
+            const script = await response.json();
+            currentScriptId = scriptId;
+            
+            document.getElementById('scriptModalTitle').textContent = 'Edit Script';
+            document.getElementById('script-id').value = scriptId;
+            document.getElementById('script-name').value = script.displayName || '';
+            document.getElementById('script-description').value = script.description || '';
+            
+            const platform = script.platform || (script.platforms === 'Linux' ? 'Linux' : script.platforms === 'macOS' ? 'macOS' : 'Windows');
+            const scriptType = script.scriptType || (script.fileName && script.fileName.endsWith('.ps1') ? 'PowerShell' : 'Shell');
+            
+            document.getElementById('script-platform').value = platform;
+            document.getElementById('script-type').value = scriptType;
+            document.getElementById('script-content-editor').value = script.scriptContent || '';
+            document.getElementById('run-as-account').value = script.runAsAccount || 'system';
+            
+            const isPowerShell = scriptType === 'PowerShell' && platform === 'Windows';
+            const enforceSignatureCheck = document.getElementById('enforce-signature-check');
+            const runAs32bit = document.getElementById('run-as32bit');
+            
+            if (isPowerShell) {
+                enforceSignatureCheck.checked = script.enforceSignatureCheck || false;
+                runAs32bit.checked = script.runAs32Bit || false;
+                enforceSignatureCheck.disabled = false;
+                runAs32bit.disabled = false;
+            } else {
+                enforceSignatureCheck.checked = false;
+                runAs32bit.checked = false;
+                enforceSignatureCheck.disabled = true;
+                runAs32bit.disabled = true;
+            }
+            
+            document.getElementById('script-type').disabled = true;
+            document.getElementById('script-platform').disabled = true;
+            
+            const assignmentsSection = document.getElementById('assignments-section');
+            const scriptGroupSelectContainer = document.getElementById('script-group-select-container');
+            const scriptGroupSelect = document.getElementById('script-group-select');
+            
+            if (script.assignments && script.assignments.length > 0) {
+                assignmentsSection.style.display = 'block';
+                
+                const assignment = script.assignments[0];
+                const target = assignment.target || {};
+                const targetType = target['@odata.type'] || '';
+                
+                document.querySelectorAll('input[name="scriptAssignmentType"]').forEach(radio => {
+                    radio.checked = false;
+                    radio.onchange = handleScriptAssignmentTypeChange;
+                });
+                
+                if (targetType === '#microsoft.graph.groupAssignmentTarget' && target.groupId) {
+                    document.getElementById('scriptAssignmentSelectGroups').checked = true;
+                    scriptGroupSelectContainer.style.display = 'block';
+                    await loadGroupsForScript();
+                    scriptGroupSelect.value = target.groupId;
+                } else if (targetType === '#microsoft.graph.allDevicesAssignmentTarget') {
+                    document.getElementById('scriptAssignmentAllDevices').checked = true;
+                    scriptGroupSelectContainer.style.display = 'none';
+                } else if (targetType === '#microsoft.graph.allLicensedUsersAssignmentTarget') {
+                    document.getElementById('scriptAssignmentAllUsers').checked = true;
+                    scriptGroupSelectContainer.style.display = 'none';
+                }
+            } else {
+                resetAssignmentsSection();
+                document.querySelectorAll('input[name="scriptAssignmentType"]').forEach(radio => {
+                    radio.onchange = handleScriptAssignmentTypeChange;
+                });
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('scriptModal'));
+            modal.show();
+        } catch (error) {
+            showStatus(`Error loading script: ${error.message}`, 'error');
+        }
+    }
+    
+    async function loadGroupsForScript() {
+        const scriptGroupSelect = document.getElementById('script-group-select');
+        scriptGroupSelect.disabled = true;
+        
+        try {
+            const response = await fetch('/intune/manage/groups', {
+                credentials: 'same-origin'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to load groups');
+            }
+            
+            const groups = await response.json();
+            
+            if (groups.length === 0) {
+                scriptGroupSelect.innerHTML = '<option value="">-- No groups available --</option>';
+            } else {
+                scriptGroupSelect.innerHTML = '<option value="">-- Select a group --</option>' + 
+                    groups.map(group => `
+                        <option value="${group.id}">${escapeHtml(group.displayName || group.mail || 'Unnamed Group')}</option>
+                    `).join('');
+                scriptGroupSelect.disabled = false;
+            }
+        } catch (error) {
+            scriptGroupSelect.innerHTML = '<option value="">-- Error loading groups --</option>';
+        }
+    }
+
+    async function saveScript() {
+        const scriptId = document.getElementById('script-id').value;
+        const name = document.getElementById('script-name').value;
+        const description = document.getElementById('script-description').value;
+        const scriptContent = document.getElementById('script-content-editor').value;
+        const scriptPlatform = document.getElementById('script-platform').value;
+        const scriptType = document.getElementById('script-type').value;
+        const runAsAccount = document.getElementById('run-as-account').value;
+        const enforceSignatureCheck = document.getElementById('enforce-signature-check').checked;
+        const runAs32bit = document.getElementById('run-as32bit').checked;
+
+        if (!name || !scriptContent) {
+            showStatus('Name and script content are required', 'error');
+            return;
+        }
+
+        const saveButton = document.getElementById('save-script-btn');
+        const originalText = saveButton.innerHTML;
+        saveButton.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Saving...';
+        saveButton.disabled = true;
+
+        try {
+            let response;
+            if (scriptId) {
+                response = await fetch(`/intune/manage/scripts/${scriptId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                        script_content: scriptContent,
+                        run_as_account: runAsAccount,
+                        enforce_signature_check: enforceSignatureCheck,
+                        run_as32bit: runAs32bit
+                    })
+                });
+            } else {
+                response = await fetch('/intune/manage/scripts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                        script_content: scriptContent,
+                        script_type: scriptType,
+                        platform: scriptPlatform,
+                        run_as_account: runAsAccount,
+                        enforce_signature_check: enforceSignatureCheck,
+                        run_as32bit: runAs32bit
+                    })
+                });
+            }
+
+            const result = await response.json();
+
+            if (result.success !== false) {
+                const newScriptId = scriptId || result.script?.id;
+                
+                if (newScriptId) {
+                    const assignmentType = document.querySelector('input[name="scriptAssignmentType"]:checked')?.value;
+                    const assignmentsSection = document.getElementById('assignments-section');
+                    
+                    if (assignmentsSection.style.display === 'block' && assignmentType) {
+                        let assignmentPayload = {};
+                        
+                        if (assignmentType === 'select_groups') {
+                            const groupId = document.getElementById('script-group-select').value;
+                            if (groupId) {
+                                assignmentPayload = {
+                                    assignment_type: 'select_groups',
+                                    group_id: groupId
+                                };
+                            }
+                        } else if (assignmentType === 'all_devices') {
+                            assignmentPayload = {
+                                assignment_type: 'all_devices'
+                            };
+                        } else if (assignmentType === 'all_users') {
+                            assignmentPayload = {
+                                assignment_type: 'all_users'
+                            };
+                        }
+                        
+                        if (Object.keys(assignmentPayload).length > 0) {
+                            try {
+                                const assignmentResponse = await fetch(`/intune/manage/scripts/${newScriptId}/execute`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    credentials: 'same-origin',
+                                    body: JSON.stringify(assignmentPayload)
+                                });
+                                
+                                if (!assignmentResponse.ok) {
+                                    const assignmentError = await assignmentResponse.json().catch(() => ({}));
+                                    console.warn(`Failed to update assignments: ${assignmentError.message || 'Unknown error'}`);
+                                }
+                            } catch (assignmentError) {
+                                console.warn(`Error updating assignments: ${assignmentError.message}`);
+                            }
+                        }
+                    }
+                }
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('scriptModal'));
+                modal.hide();
+                showStatus(scriptId ? 'Script updated successfully' : 'Script created successfully', 'success');
+                await loadScripts();
+            } else {
+                showStatus(`Error: ${result.message || 'Failed to save script'}`, 'error');
+            }
+        } catch (error) {
+            showStatus(`Error saving script: ${error.message}`, 'error');
+        } finally {
+            saveButton.innerHTML = originalText;
+            saveButton.disabled = false;
+        }
+    }
+
+    async function deleteScript(scriptId) {
+        if (!confirm('Are you sure you want to delete this script?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/intune/manage/scripts/${scriptId}`, {
+                method: 'DELETE',
+                credentials: 'same-origin'
+            });
+
+            const result = await response.json();
+
+            if (result.success !== false) {
+                showStatus('Script deleted successfully', 'success');
+                await loadScripts();
+            } else {
+                showStatus(`Error: ${result.message || 'Failed to delete script'}`, 'error');
+            }
+        } catch (error) {
+            showStatus(`Error deleting script: ${error.message}`, 'error');
+        }
+    }
+
+    document.getElementById('create-script-btn')?.addEventListener('click', showCreateModal);
+    document.getElementById('refresh-scripts-btn')?.addEventListener('click', loadScripts);
+    document.getElementById('save-script-btn')?.addEventListener('click', saveScript);
+    document.getElementById('script-type')?.addEventListener('change', updateScriptTypeFields);
+    document.getElementById('script-platform')?.addEventListener('change', updateScriptTypeFields);
+
+    document.getElementById('search-items')?.addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.item-row').forEach(row => {
+            const scriptName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const description = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            const detailsRow = document.querySelector(`.details-row[data-script-id="${row.dataset.scriptId}"]`);
+
+            if (scriptName.includes(searchTerm) || description.includes(searchTerm)) {
+                row.style.display = '';
+                if (detailsRow) detailsRow.style.display = '';
+            } else {
+                row.style.display = 'none';
+                if (detailsRow) detailsRow.style.display = 'none';
+            }
+        });
+    });
+
+    loadScripts();
+</script>
+{% endblock %}
+

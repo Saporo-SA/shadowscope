@@ -1,0 +1,2 @@
+"""Azure Resources routes package."""
+

@@ -1,0 +1,292 @@
+{% macro render_permissions(module_name, access) %}
+<style>
+    .permission-panel {
+        margin-bottom: 1rem;
+    }
+    .permission-toggle {
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+        margin-bottom: 0.5rem;
+    }
+    .permission-toggle:hover {
+        opacity: 0.9;
+    }
+    .permission-toggle-btn {
+        border: none;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-align: left;
+        font-weight: 500;
+        padding: 0;
+        color: var(--primary-1);
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+    .permission-toggle-btn:hover {
+        text-decoration: underline;
+    }
+    .permission-toggle-btn:focus {
+        outline: none;
+        text-decoration: underline;
+    }
+    .permission-toggle-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 24px;
+        width: 24px;
+        border-radius: 50%;
+        background: rgba(255, 113, 91, 0.1);
+        margin-right: 6px;
+        flex-shrink: 0;
+    }
+    .permission-toggle-text {
+        flex: 1;
+    }
+    .permission-toggle-arrow {
+        transition: transform 0.2s ease;
+        color: var(--primary-1);
+        opacity: 0.7;
+    }
+    [aria-expanded="true"] .permission-toggle-arrow {
+        transform: rotate(180deg);
+    }
+    .permission-content {
+        background: rgba(18, 20, 29, 0.8);
+        border: 1px solid rgba(255, 113, 91, 0.15);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        margin-top: 0.75rem;
+        backdrop-filter: blur(10px);
+    }
+    .permission-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.15);
+        background: rgba(18, 20, 29, 0.9);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .permission-header-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        width: 28px;
+        border-radius: 6px;
+        background: linear-gradient(45deg, rgba(255, 113, 91, 0.2), rgba(255, 147, 79, 0.2));
+        color: var(--primary-1);
+        font-size: 1rem;
+    }
+    .permission-header-title {
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    .permission-body {
+        padding: 16px;
+        color: var(--gray-4);
+    }
+    .permission-section {
+        margin-bottom: 1.5rem;
+    }
+    .permission-section:last-child {
+        margin-bottom: 0;
+    }
+    .permission-section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    .permission-section-title i {
+        color: var(--primary-1);
+    }
+    .permission-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3em 0.6em;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+        background: rgba(255, 113, 91, 0.2);
+        color: var(--primary-1);
+        border: none;
+    }
+    .permission-badge:hover {
+        background: rgba(255, 113, 91, 0.3);
+        transform: translateY(-1px);
+    }
+    .permission-badge i {
+        font-size: 0.7rem;
+    }
+    .permission-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 6px;
+        overflow: hidden;
+        background: rgba(18, 20, 29, 0.5);
+        border: 1px solid rgba(255, 113, 91, 0.1);
+    }
+    .permission-table th {
+        background: rgba(18, 20, 29, 0.9);
+        color: var(--primary-1);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.15);
+    }
+    .permission-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255, 113, 91, 0.05);
+        color: var(--gray-4);
+        font-size: 0.85rem;
+        vertical-align: middle;
+    }
+    .permission-table tr:last-child td {
+        border-bottom: none;
+    }
+    .permission-table tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .permission-table tr:hover {
+        background: rgba(255, 113, 91, 0.05);
+    }
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3em 0.6em;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    .status-enabled {
+        background: rgba(60, 207, 145, 0.2);
+        color: var(--primary-3);
+        border: none;
+    }
+    .status-disabled {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--gray-4);
+        border: none;
+    }
+    @media (max-width: 768px) {
+        .permission-table {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .permission-badge {
+            margin-bottom: 8px;
+        }
+    }
+</style>
+
+<div class="permission-panel">
+    <div class="permission-toggle">
+        <button class="permission-toggle-btn" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#permissions-info-{{ module_name }}" aria-expanded="false" 
+                aria-controls="permissions-info-{{ module_name }}">
+            <div class="permission-toggle-icon">
+                <i class="bi bi-shield-lock" style="color: var(--primary-1);"></i>
+            </div>
+            <span class="permission-toggle-text">View required permissions</span>
+            <i class="bi bi-chevron-down permission-toggle-arrow"></i>
+        </button>
+    </div>
+
+    <div class="collapse" id="permissions-info-{{ module_name }}">
+        <div class="permission-content">
+            <div class="permission-header">
+                <div class="permission-header-icon">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <h6 class="permission-header-title">Permission Information</h6>
+            </div>
+            <div class="permission-body">
+
+                <div class="permission-section">
+                    <div class="permission-section-title">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Base Access Required</span>
+                    </div>
+                    <div class="mb-2" style="color: var(--gray-4); font-size: 0.85rem;">You need at least one of these permissions to access this module:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                        {% for perm in access[module_name].base_perms %}
+                        <span class="permission-badge">
+                            <i class="bi bi-key"></i>
+                            {{ perm }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if access[module_name].features|length > 0 %}
+                <div class="permission-section">
+                    <div class="permission-section-title">
+                        <i class="bi bi-tools"></i>
+                        <span>Feature Availability</span>
+                    </div>
+                    <div class="mb-3" style="color: var(--gray-4); font-size: 0.85rem;">The following features are enabled or disabled based on your permissions:</div>
+                    <table class="permission-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Feature</th>
+                                <th style="width: 15%;">Status</th>
+                                <th style="width: 60%;">Required Permissions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feature_name, feature_info in access[module_name].features.items() %}
+                            <tr>
+                                <td style="white-space: nowrap; color: var(--white); font-weight: 500;">{{ feature_info.display_name }}</td>
+                                <td>
+                                    {% if feature_info.enabled %}
+                                    <span class="status-badge status-enabled">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Enabled
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge status-disabled">
+                                        <i class="bi bi-x-circle"></i>
+                                        Disabled
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center;">
+                                    {% for perm in feature_info.perms %}
+                                    <span class="permission-badge">
+                                        <i class="bi bi-key"></i>
+                                        {{ perm }}
+                                    </span>
+                                    {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}

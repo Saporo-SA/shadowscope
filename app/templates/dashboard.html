@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowScope</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff;
+            --primary: #ff715b;
+            --primary-light: #ff8c7c;
+            --primary-dark: #d85a47;
+            --accent-1: #ff934f;
+            --accent-2: #3ccf91;
+            --accent-3: #3c5ccf;
+            --accent-4: #8f2df0;
+            --accent-5: #5132c0;
+            --dark-bg: #0a0b0e;
+            --card-bg: #13151a;
+            --card-hover: #1a1d24;
+            --gray-light: #e4e6eb;
+            --gray-med: #9ba1ad;
+            --gray-dark: #4a5160;
+            --border-color: #1f2128;
+            --sidebar-width: 260px;
+            --header-height: 64px;
+            --critical: #ff3b30;
+            --high: #ff9500;
+            --medium: #ffcc00;
+            --low: #34c759;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            color: var(--gray-light);
+            background-color: var(--dark-bg);
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .app-container {
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: var(--header-height) 1fr;
+            grid-template-areas:
+                "sidebar header"
+                "sidebar main";
+            height: 100vh;
+            width: 100vw;
+            background: var(--dark-bg);
+        }
+        .sidebar {
+            grid-area: sidebar;
+            background: #0d0e11;
+            padding: 0.875rem 0.625rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1200;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-dark);
+        }
+        .sidebar-brand {
+            padding: 0.375rem 0.625rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+        .sidebar-brand-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .sidebar-brand a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sidebar-brand-author {
+            font-size: 0.7rem;
+            color: var(--gray-med);
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: -0.25rem;
+            text-transform: uppercase;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .sidebar-brand-author:hover {
+            color: var(--primary);
+            transform: translateY(-1px);
+            text-shadow: 0 0 8px rgba(255, 113, 91, 0.4);
+        }
+        .sidebar-brand-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--white);
+            filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .sidebar-brand-text span {
+            color: var(--primary);
+        }
+        .sidebar-heading {
+            font-size: 0.875rem; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--white); 
+            margin: 0.75rem 0.625rem 0.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .sidebar-heading i {
+            color: var(--primary);
+        }
+        .sidebar-heading span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            white-space: nowrap; 
+        }
+        .sidebar-heading .badge {
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .nav-group {
+            margin-bottom: 0.25rem;
+            padding-left: 1rem;
+        }
+        .nav-link {
+            color: var(--white); 
+            padding: 0.375rem 0.625rem;
+            margin: 1px 0;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-size: 0.8125rem;
+            text-decoration: none;
+            position: relative;
+        }
+        .nav-link i {
+            font-size: 1rem;
+            width: 1.25rem;
+            text-align: center;
+        }
+        .nav-link:hover {
+            background: var(--card-bg);
+            color: var(--white);
+        }
+        .nav-link.active {
+            background: var(--card-bg);
+            color: var(--white);
+        }
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: var(--primary);
+            border-radius: 0 2px 2px 0;
+        }
+        .nav-link.disabled {
+            color: var(--gray-dark);
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .logout-btn {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: rgba(255, 113, 91, 0.1);
+            border: 1px solid rgba(255, 113, 91, 0.3);
+            color: var(--primary);
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 0.8125rem;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 113, 91, 0.2);
+            transform: translateY(-1px);
+            color: var(--primary);
+        }
+        .social-links {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            justify-content: center;
+        }
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--card-bg);
+            color: var(--gray-med);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .social-link:hover {
+            background: var(--card-hover);
+            color: var(--primary);
+        }
+        .social-link img {
+            width: 16px;
+            height: 16px;
+            filter: brightness(0) saturate(100%) invert(67%) sepia(8%) saturate(551%) hue-rotate(183deg) brightness(91%) contrast(87%);
+            transition: filter 0.2s ease;
+        }
+        .social-link:hover img {
+            filter: brightness(0) saturate(100%) invert(58%) sepia(56%) saturate(2667%) hue-rotate(334deg) brightness(101%) contrast(101%);
+        }
+        .header {
+            grid-area: header;
+            display: flex;
+            align-items: center;
+            padding: 0 1.125rem;
+            background: #0d0e11;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1100;
+        }
+        .header-content {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .app-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .app-name {
+            font-weight: 700;
+            color: var(--white);
+            font-size: 0.9375rem;
+        }
+        .app-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent-1));
+            color: var(--white);
+            padding: 0.1875rem 0.4375rem;
+            border-radius: 4px;
+            font-size: 0.5625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .copy-token-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--gray-light);
+            padding: 0.4375rem 0.875rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .copy-token-btn:hover {
+            background: var(--card-hover);
+            border-color: var(--gray-dark);
+            transform: translateY(-1px);
+        }
+        .main-content {
+            grid-area: main;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            background: var(--dark-bg);
+            width: 100%;
+            max-width: 100%;
+        }
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-dark);
+        }
+        .dashboard-layout {
+            display: grid;
+            gap: 0.875rem;
+            width: 100%;
+            max-width: none;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.625rem;
+            margin-bottom: 0.875rem;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 0.875rem;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-height: 80px;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color, var(--primary)), transparent);
+        }
+        .stat-card:hover {
+            border-color: var(--gray-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(255, 113, 91, 0.1);
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        .stat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+        .stat-label {
+            font-size: 0.6875rem;
+            color: var(--gray-med);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1;
+            flex-shrink: 0;
+            text-align: right;
+        }
+        .stat-trend {
+            font-size: 0.6875rem;
+            color: var(--accent-2);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            line-height: 1;
+        }
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .card-header {
+            padding: 0.875rem 1.125rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 113, 91, 0.03);
+        }
+        .card-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--white);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+        .card-title i {
+            color: var(--primary);
+            font-size: 1.125rem;
+        }
+        .card-body {
+            padding: 1rem;
+        }
+        .toggle-cards-btn {
+            background: none;
+            border: none;
+            color: var(--gray-med);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .toggle-cards-btn:hover {
+            background: var(--card-hover);
+            color: var(--white);
+        }
+        .toggle-cards-btn i {
+            transition: transform 0.3s ease;
+        }
+        .collapsed-cards .card-body {
+            display: none;
+        }
+        .collapsed-cards .toggle-cards-btn i {
+            transform: rotate(180deg);
+        }
+        .attack-meter-section {
+            margin-bottom: 0.875rem;
+        }
+        .attack-meter-container {
+            background: linear-gradient(135deg, rgba(255, 113, 91, 0.08), rgba(255, 147, 79, 0.05));
+            border: 1px solid rgba(255, 113, 91, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem 0.875rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .attack-meter-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 100% 0%, rgba(255, 113, 91, 0.1), transparent 50%);
+            pointer-events: none;
+        }
+        .meter-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+        .meter-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 7px;
+            background: rgba(255, 113, 91, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.125rem;
+        }
+        .meter-title {
+            font-size: 0.9375rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+        }
+        .meter-subtitle {
+            font-size: 0.75rem;
+            color: var(--gray-med);
+            line-height: 1.2;
+        }
+        .meter-display {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            min-width: 0;
+        }
+        .meter-bar {
+            height: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 6px;
+            overflow: visible;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--low) 0%, var(--medium) 40%, var(--high) 70%, var(--critical) 100%);
+            border-radius: 6px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 113, 91, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.625rem;
+        }
+        .meter-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--gray-med);
+        }
+        .meter-percentage-display {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--white);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            line-height: 1;
+        }
+        .api-permissions-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .api-permissions-header {
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 113, 91, 0.05);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .api-permissions-header:hover {
+            background: rgba(255, 113, 91, 0.08);
+        }
+        .api-permissions-header h4 {
+            margin: 0;
+            font-size: 0.8125rem;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            font-weight: 700;
+        }
+        .api-permissions-header h4 i {
+            color: var(--primary);
+        }
+        .expand-btn {
+            background: none;
+            border: none;
+            color: var(--gray-med);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .expand-btn:hover {
+            background: var(--card-hover);
+            color: var(--white);
+        }
+        .expand-btn i {
+            transition: transform 0.3s ease;
+        }
+        .expand-btn i.rotated {
+            transform: rotate(180deg);
+        }
+        .api-permissions-content {
+            padding: 0.875rem;
+            display: none;
+        }
+        .permissions-grid-improved {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .permission-badge-improved {
+            background: rgba(60, 207, 145, 0.08);
+            border: 1px solid rgba(60, 207, 145, 0.15);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            cursor: default;
+            white-space: nowrap;
+        }
+        .permission-badge-improved:hover {
+            background: rgba(60, 207, 145, 0.15);
+            border-color: rgba(60, 207, 145, 0.3);
+            transform: translateY(-1px);
+        }
+        .permission-badge-improved i {
+            color: var(--accent-2);
+            font-size: 0.8125rem;
+            flex-shrink: 0;
+        }
+        .permission-badge-improved span {
+            white-space: nowrap;
+        }
+        .attack-tactics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 0.625rem;
+        }
+        .tactic-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .tactic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .tactic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--tactic-color, var(--primary));
+            border-radius: 8px 0 0 8px;
+        }
+        .tactic-card:hover {
+            border-color: var(--tactic-color, var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        .tactic-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.375rem;
+            padding-bottom: 0.375rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .tactic-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8125rem;
+            background: rgba(255, 113, 91, 0.1);
+            color: var(--tactic-color, var(--primary));
+        }
+        .tactic-title {
+            font-size: 0.8125rem;
+            font-weight: 700;
+            color: var(--white);
+            margin: 0;
+            line-height: 1.2;
+        }
+        .tactic-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .tactic-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4375rem;
+            padding: 0.3125rem 0.4375rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .tactic-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .tactic-item i {
+            font-size: 0.75rem;
+            width: 14px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .tactic-item i.bi-check-circle-fill {
+            color: var(--accent-2);
+        }
+        .tactic-item i.bi-x-circle {
+            color: var(--gray-dark);
+        }
+        .tactic-item-text {
+            flex: 1;
+            font-size: 0.6875rem;
+            color: var(--gray-light);
+            line-height: 1.25;
+        }
+        .tactic-critical {
+            --tactic-color: var(--critical);
+        }
+        .tactic-high {
+            --tactic-color: var(--high);
+        }
+        .tactic-medium {
+            --tactic-color: var(--accent-2);
+        }
+        .search-section {
+            margin-top: 0.875rem;
+        }
+        .search-box {
+            display: flex;
+            gap: 0.625rem;
+            margin-bottom: 0.75rem;
+        }
+        .search-input {
+            flex: 1;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--white);
+            border-radius: 8px;
+            padding: 0.625rem 0.875rem;
+            font-size: 0.8125rem;
+            transition: all 0.2s ease;
+        }
+        .search-input:focus {
+            background: var(--card-hover);
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 113, 91, 0.1);
+        }
+        .search-input::placeholder {
+            color: var(--gray-dark);
+        }
+        .search-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent-1));
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 113, 91, 0.3);
+        }
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .search-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .suggestion-tag {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--gray-light);
+            padding: 0.3125rem 0.625rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .suggestion-tag:hover {
+            background: var(--card-hover);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+        .search-results-area {
+            display: none;
+            margin-top: 1rem;
+        }
+        .search-results-area.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        }
+        .search-results-table {
+            width: 100%;
+            border-collapse: collapse;
+            display: none;
+        }
+        .search-results-table.has-results {
+            display: table;
+        }
+        .search-results-table thead th {
+            background: rgba(255, 113, 91, 0.1);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.75rem 0.875rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .search-results-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .search-results-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .search-results-table td {
+            padding: 0.75rem 0.875rem;
+            font-size: 0.8125rem;
+            color: var(--gray-light);
+        }
+        .result-title {
+            color: var(--white);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.8125rem;
+        }
+        .result-icon {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        .result-content {
+            font-size: 0.75rem;
+            color: var(--gray-med);
+            margin-top: 0.375rem;
+            line-height: 1.4;
+        }
+        .keyword-highlight {
+            background: rgba(255, 113, 91, 0.3);
+            color: var(--white);
+            padding: 0 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .result-type {
+            background: rgba(255, 113, 91, 0.15);
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .result-link {
+            color: var(--accent-3);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        .result-link:hover {
+            color: var(--accent-2);
+        }
+        .search-status {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            color: var(--gray-med);
+            font-size: 0.8125rem;
+        }
+        .status-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--gray-dark);
+        }
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .load-more-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--gray-light);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: none;
+            margin: 1rem auto;
+            width: 100%;
+            max-width: 300px;
+        }
+        .load-more-btn:hover {
+            background: var(--card-hover);
+            border-color: var(--primary);
+        }
+        @media (min-width: 2560px) {
+            .main-content {
+                padding: 1.5rem 2rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 0.875rem;
+            }
+            .attack-tactics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 0.875rem;
+            }
+            .dashboard-layout {
+                gap: 1.25rem;
+            }
+        }
+        @media (min-width: 3440px) {
+            .main-content {
+                padding: 2rem 3rem;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1rem;
+            }
+            .attack-tactics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+                gap: 1rem;
+            }
+            .dashboard-layout {
+                gap: 1.5rem;
+            }
+        }
+        @media (max-width: 1400px) {
+            .attack-tactics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            }
+        }
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+        }
+        @media (max-width: 900px) {
+            .attack-tactics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+        }
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: var(--header-height) 1fr;
+                grid-template-areas:
+                    "header"
+                    "main";
+            }
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: var(--header-height);
+                height: calc(100vh - var(--header-height));
+                width: 280px;
+                transition: left 0.3s ease;
+                z-index: 2000;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            .attack-tactics-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-box {
+                flex-direction: column;
+            }
+            .meter-percentage-display {
+                font-size: 1.125rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-warning {
+            background: rgba(255, 149, 0, 0.2);
+            color: var(--high);
+        }
+        .btn.btn-sm.btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-wrapper">
+                <a href="/">
+                    <span class="sidebar-brand-text">Shadow<span>Scope</span></span>
+                </a>
+                    <a href="https://saporo.io" target="_blank" class="sidebar-brand-author">BY SAPORO</a>
+                </div>
+            </div>
+
+            <div class="sidebar-heading">
+                <img src="{{ url_for('static', filename='icons/Entra.svg') }}" alt="Entra ID" style="width: 16px; height: 16px;">
+                <span>Entra ID</span>
+            </div>
+            <div class="nav-group">
+                <a class="nav-link {% if not access.get('users', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'users.list_users' %}active{% endif %}"
+                    href="{{ url_for('users.list_users') }}">
+                    <i class="bi bi-person"></i> Users
+                </a>
+                <a class="nav-link {% if not access.get('groups', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'groups.list_groups' %}active{% endif %}"
+                    href="{{ url_for('groups.list_groups') }}">
+                    <i class="bi bi-people"></i> Groups
+                </a>
+                <a class="nav-link {% if not access.get('admin_units', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'admin_units.administrative_units' %}active{% endif %}"
+                    href="{{ url_for('admin_units.administrative_units') }}">
+                    <i class="bi bi-diagram-3"></i> Administrative Units
+                </a>
+                <a class="nav-link {% if not access.get('service_principals', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'service_principals.list_service_principals' %}active{% endif %}"
+                    href="{{ url_for('service_principals.list_service_principals') }}">
+                    <i class="bi bi-key"></i> Enterprise Apps
+                </a>
+                <a class="nav-link {% if not access.get('roles', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'roles.list_roles' %}active{% endif %}"
+                    href="{{ url_for('roles.list_roles') }}">
+                    <i class="bi bi-person-badge"></i> Roles
+                </a>
+            </div>
+
+            <div class="sidebar-heading">
+                <img src="{{ url_for('static', filename='icons/365.svg') }}" alt="Microsoft 365" style="width: 16px; height: 16px;">
+                <span>Microsoft 365</span>
+            </div>
+            <div class="nav-group">
+                <a class="nav-link {% if not access.get('teams', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'teams.list_teams' %}active{% endif %}"
+                    href="{{ url_for('teams.list_teams') }}">
+                    <i class="bi bi-microsoft-teams"></i> Teams
+                </a>
+                <a class="nav-link {% if not access.get('sharepoint', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'sharepoint.list_sharepoint_sites' %}active{% endif %}"
+                    href="{{ url_for('sharepoint.list_sharepoint_sites') }}">
+                    <i class="ms-Icon ms-Icon--SharepointLogo" aria-hidden="true"></i> SharePoint
+                </a>
+                <a class="nav-link {% if not access.get('outlook', {}).get('base', False) %}disabled{% endif %} {% if 'outlook' in request.endpoint %}active{% endif %}"
+                    href="{{ url_for('outlook.outlook_users') }}">
+                    <i class="ms-Icon ms-Icon--OutlookLogo" aria-hidden="true"></i> Outlook
+                </a>
+            </div>
+
+            <div class="sidebar-heading">
+                <img src="{{ url_for('static', filename='icons/Intune.svg') }}" alt="Microsoft Intune" style="width: 16px; height: 16px;">
+                <span>Microsoft Intune</span>
+            </div>
+            <div class="nav-group">
+                <a class="nav-link {% if not access.get('intune', {}).get('base', False) %}disabled{% endif %} {% if request.endpoint == 'intune.intune_devices' %}active{% endif %}"
+                    href="{{ url_for('intune.intune_devices') }}">
+                    <i class="bi bi-laptop"></i> Devices
+                </a>
+            </div>
+
+            <div class="sidebar-heading">
+                <img src="{{ url_for('static', filename='icons/Azure.svg') }}" alt="Azure" style="width: 16px; height: 16px;">
+                <span>Azure<span class="badge badge-warning">Alpha</span></span>
+            </div>
+            <div class="nav-group">
+                <a class="nav-link {% if not has_azure_resource_token %}disabled{% endif %}" href="{{ url_for('management_groups.management_groups') }}">
+                    <i class="bi bi-diagram-3"></i> Management Groups
+                </a>
+                <a class="nav-link {% if not has_azure_resource_token %}disabled{% endif %}" href="{{ url_for('subscriptions.subscriptions') }}">
+                    <i class="bi bi-key"></i> Subscriptions
+                </a>
+                <a class="nav-link {% if not has_azure_resource_token %}disabled{% endif %}" href="{{ url_for('resource_groups.azure_resource_groups') }}">
+                    <i class="bi bi-folder"></i> Resource Groups
+                </a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="social-links">
+                    <a href="https://saporo.io" target="_blank" class="social-link">
+                        <img src="{{ url_for('static', filename='favicon64.svg') }}" alt="Saporo">
+                    </a>
+                    <a href="https://github.com/Saporo-SA/shadowscope" target="_blank" class="social-link">
+                        <i class="bi bi-github"></i>
+                    </a>
+                    <a href="{{ url_for('notifications.notifications') }}" class="social-link" title="Change Notifications">
+                        <i class="bi bi-bell-fill" style="color: #ff8c00;"></i>
+                    </a>
+                    <a href="{{ url_for('dashboard.about') }}" class="social-link">
+                        <i class="bi bi-info-circle"></i>
+                    </a>
+                </div>
+                <a class="logout-btn" href="{{ url_for('auth.logout') }}">
+                    <i class="bi bi-box-arrow-left"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <div class="app-info">
+                    <div>
+                        <div class="app-name">{{ app_info.app_name }}</div>
+                        <span class="app-badge">
+                            <i class="bi bi-bug-fill"></i>
+                            PWNED APPLICATION
+                        </span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="token-expiry-container" id="tokenExpiryContainer" style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="token-expiry-badge" id="tokenExpiryBadge" style="
+                            background: var(--card-bg);
+                            border: 1px solid var(--border-color);
+                            padding: 0.4375rem 0.875rem;
+                            border-radius: 6px;
+                            font-size: 0.8125rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                            font-weight: 500;
+                        ">
+                            <i class="bi bi-clock-history" style="color: var(--accent-2);"></i>
+                            <span id="tokenExpiryText">Checking...</span>
+                        </div>
+                        <button class="copy-token-btn" id="copyToken">
+                            <i class="bi bi-clipboard"></i>
+                            Copy Token
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            {% block dynamic_content %}
+            {% if request.endpoint == 'dashboard.dashboard' %}
+            <div class="dashboard-layout">
+                <div class="stats-grid">
+                    <div class="stat-card" style="--accent-color: var(--critical);">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-crosshairs"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-header">
+                                <div class="stat-label">Attack Vectors</div>
+                                <div class="stat-value" id="attackVectorsCount">0</div>
+                            </div>
+                            <div class="stat-trend">
+                                <i class="bi bi-arrow-up-right"></i> High Risk
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: var(--high);">
+                        <div class="stat-icon">
+                            <i class="bi bi-key-fill"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-header">
+                                <div class="stat-label">API Permissions</div>
+                                <div class="stat-value">{{ app_info.permissions|length }}</div>
+                            </div>
+                            <div class="stat-trend">
+                                <i class="bi bi-shield-check"></i> Active
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: var(--accent-2);">
+                        <div class="stat-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-header">
+                                <div class="stat-label">Accessible Resources</div>
+                                <div class="stat-value" id="resourcesCount">0</div>
+                            </div>
+                            <div class="stat-trend">
+                                <i class="bi bi-database-check"></i> Discovered
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="--accent-color: var(--accent-3);">
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-user-secret"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-header">
+                                <div class="stat-label">Privilege Level</div>
+                                <div class="stat-value" id="privilegeLevel">0%</div>
+                            </div>
+                            <div class="stat-trend">
+                                <i class="bi bi-graph-up"></i> Calculated
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="section-card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fa-solid fa-book-skull"></i>
+                                Offensive Security Dashboard
+                            </h3>
+                            <button class="toggle-cards-btn" id="toggleCardsBtn">
+                                <i class="bi bi-chevron-up"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                        <div class="attack-meter-section">
+                            <div class="attack-meter-container">
+                                <div class="meter-header">
+                                    <div class="meter-icon">
+                                    <i class="fa-solid fa-skull"></i>
+                                </div>
+                                    <div>
+                                        <div class="meter-title">Attack Likelihood</div>
+                                        <div class="meter-subtitle">Based on available permissions and attack vectors</div>
+                                    </div>
+                                </div>
+                                <div class="meter-display">
+                                    <div class="meter-bar">
+                                        <div class="meter-fill" id="compromiseMeterBar" style="width: 0%;">
+                                            <div class="meter-percentage-display" id="compromisePercentage">0%</div>
+                                    </div>
+                                    </div>
+                                    <div class="meter-labels">
+                                        <span>Low</span>
+                                        <span>Medium</span>
+                                        <span>High</span>
+                                        <span>Critical</span>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="api-permissions-container">
+                                <div class="api-permissions-header" id="apiPermissionsToggle">
+                                <h4>
+                                    <i class="bi bi-key-fill"></i>
+                                    Microsoft Graph API Permissions
+                                </h4>
+                                    <button class="expand-btn">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </div>
+                            <div class="api-permissions-content" id="apiPermissionsContent">
+                                <div class="permissions-grid-improved">
+                                        {% for permission in app_info.permissions %}
+                                        <div class="permission-badge-improved" title="{{ permission }}">
+                                            <i class="bi bi-shield-lock"></i>
+                                            <span>{{ permission }}</span>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div class="attack-tactics-grid">
+                            <div class="tactic-card tactic-critical">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="fa-solid fa-stairs"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Privilege Escalation</h4>
+                                    </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('roles', {}).get('features', {}).get('manage_role_assignments', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Assign Entra ID roles to controlled users</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('groups', {}).get('features', {}).get('manage_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Add users to privileged groups</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('admin_units', {}).get('features', {}).get('manage_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Add users to administrative units</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('features', {}).get('manage_role_assignments', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Grant MS Graph API permissions</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('features', {}).get('manage_apps', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Add secrets to service principals</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('users', {}).get('features', {}).get('reset_auth_methods', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Reset authentication methods (MFA/passwordless)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tactic-card tactic-high">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="fa-solid fa-person-walking-arrow-right"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Lateral Movement</h4>
+                                    </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('features', {}).get('manage_apps', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Compromise service principals</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('features', {}).get('manage_role_assignments', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Expand API permissions</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('groups', {}).get('features', {}).get('manage_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Hijack group memberships</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('edit_teams_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Modify team memberships</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('edit_channel_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Modify channel memberships</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('list_channels', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Enumerate Teams channels</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('list_channel_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">List channel members</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('intune', {}).get('features', {}).get('windows_macos_scripts', False) or access.get('intune', {}).get('features', {}).get('linux_scripts', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Create and execute Intune scripts for lateral movement</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tactic-card tactic-high">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="ms-Icon ms-Icon--Phishing"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Phishing</h4>
+                                </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('outlook', {}).get('features', {}).get('send_email', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Send emails on behalf of users</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('sharepoint', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Weaponize SharePoint files</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('read_channel_messages', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Send malicious Teams messages</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tactic-card tactic-high">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="bi bi-cloud-download-fill"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Data Exfiltration</h4>
+                                </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('sharepoint', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Extract confidential documents</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('read_channel_messages', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Read private Teams conversations</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('outlook', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Access email attachments</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('outlook', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Read all user emails</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tactic-card tactic-critical">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="bi bi-infinity"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Persistence</h4>
+                                    </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('features', {}).get('manage_role_assignments', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Grant persistent API permissions</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('features', {}).get('manage_apps', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Create backdoor credentials</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('graph_notifications', {}).get('features', {}).get('create_subscriptions', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Create Graph API notification subscriptions</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('graph_notifications', {}).get('features', {}).get('manage_subscriptions', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Manage notification subscriptions</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tactic-card tactic-medium">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Discovery</h4>
+                                </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('users', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Enumerate user accounts</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('service_principals', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">List service principals</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('groups', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Map group structures</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('roles', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Identify role assignments</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('sharepoint', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Browse SharePoint sites</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Discover Teams channels</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('teams', {}).get('features', {}).get('list_channel_members', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">List channel members</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('search', {}).get('features', {}).get('search_chat_messages', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Search Teams chat messages</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('intune', {}).get('features', {}).get('list_devices', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Enumerate Intune managed devices</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tactic-card tactic-high">
+                                <div class="tactic-header">
+                                    <div class="tactic-icon">
+                                        <i class="fa-solid fa-video"></i>
+                                    </div>
+                                    <h4 class="tactic-title">Surveillance</h4>
+                                </div>
+                                <div class="tactic-items">
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('presence', {}).get('base', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Monitor user presence status in real-time</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('graph_notifications', {}).get('features', {}).get('create_subscriptions', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Monitor conversations with keyword filtering via change notifications</div>
+                                    </div>
+                                    <div class="tactic-item">
+                                        <i class="bi {% if access.get('graph_notifications', {}).get('features', {}).get('create_subscriptions', False) %}bi-check-circle-fill{% else %}bi-x-circle{% endif %}"></i>
+                                        <div class="tactic-item-text">Monitor chat messages for sensitive information</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if access.get('sharepoint', {}).get('base', False) %}
+                <div class="search-section">
+                <div class="section-card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="bi bi-search"></i>
+                                Microsoft Graph API Search
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="search-box">
+                            <input type="text" class="search-input" id="searchInput"
+                                    placeholder="Search across assets you have access to...">
+                            <button class="search-btn" id="searchBtn">
+                                <span class="loading-spinner" id="searchSpinner"></span>
+                                    <i class="bi bi-search"></i>
+                                Search
+                            </button>
+                        </div>
+                        <div class="search-suggestions">
+                            <div class="suggestion-tag" data-value="password">password</div>
+                            <div class="suggestion-tag" data-value="secret">secret</div>
+                            <div class="suggestion-tag" data-value="config">config</div>
+                            <div class="suggestion-tag" data-value="key">key</div>
+                            <div class="suggestion-tag" data-value="token">token</div>
+                            <div class="suggestion-tag" data-value="credential">credential</div>
+                            <div class="suggestion-tag" data-value="api key">api key</div>
+                            <div class="suggestion-tag" data-value="confidential">confidential</div>
+                            <div class="suggestion-tag" data-value="private">private</div>
+                            <div class="suggestion-tag" data-value="oauth">oauth</div>
+                        </div>
+
+                            <div class="search-results-area" id="searchResultsArea">
+                                <div class="search-status" id="searchStatus">
+                                    <i class="bi bi-search status-icon"></i>
+                                    <div class="status-message">Enter a search term to hunt for sensitive data</div>
+                    </div>
+                                <div class="search-results-container" id="searchResultsContainer" style="display: none;">
+                                    <table class="search-results-table" id="searchResultsTable">
+                                        <thead>
+                                            <tr>
+                                                <th width="50%">Content</th>
+                                                <th width="15%">Type</th>
+                                                <th width="20%">Source</th>
+                                                <th width="15%">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="searchResults">
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <button class="load-more-btn" id="loadMoreBtn">
+                                    <i class="bi bi-arrow-down-circle"></i> Load More Results
+                                </button>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            {% endif %}
+            </div>
+            {% else %}
+            <div class="section-card">
+                <div class="card-body">
+                    <div class="alert alert-primary">
+                        <i class="bi bi-info-circle"></i> Select a category from the sidebar to begin
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/notification-system.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shadowscope-utils.js') }}"></script>
+    <script>
+        // Token Expiry Monitor
+        let tokenRefreshInProgress = false;
+        
+        function updateTokenExpiry() {
+            fetch('/get_token')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.token) {
+                        const tokenParts = data.token.split('.');
+                        if (tokenParts.length === 3) {
+                            const payload = JSON.parse(atob(tokenParts[1]));
+                            const exp = payload.exp;
+                            const now = Math.floor(Date.now() / 1000);
+                            const timeLeft = exp - now;
+                            
+                            const tokenExpiryBadge = document.getElementById('tokenExpiryBadge');
+                            const tokenExpiryText = document.getElementById('tokenExpiryText');
+                            const icon = tokenExpiryBadge.querySelector('i');
+                            
+                            if (timeLeft <= 0) {
+                                tokenExpiryText.textContent = 'Token Expired';
+                                tokenExpiryBadge.style.borderColor = 'var(--critical)';
+                                icon.style.color = 'var(--critical)';
+                                icon.className = 'bi bi-exclamation-triangle';
+                                
+                                if (!tokenRefreshInProgress) {
+                                    attemptTokenRefresh();
+                                }
+                            } else if (timeLeft < 300) {
+                                const minutes = Math.floor(timeLeft / 60);
+                                const seconds = timeLeft % 60;
+                                tokenExpiryText.textContent = `Expires in ${minutes}m ${seconds}s`;
+                                tokenExpiryBadge.style.borderColor = 'var(--critical)';
+                                icon.style.color = 'var(--critical)';
+                                icon.className = 'bi bi-exclamation-circle';
+                                
+                                if (!tokenRefreshInProgress) {
+                                    attemptTokenRefresh();
+                                }
+                            } else if (timeLeft < 600) {
+                                const minutes = Math.floor(timeLeft / 60);
+                                tokenExpiryText.textContent = `Expires in ${minutes}m`;
+                                tokenExpiryBadge.style.borderColor = 'var(--high)';
+                                icon.style.color = 'var(--high)';
+                                icon.className = 'bi bi-clock-history';
+                            } else {
+                                const minutes = Math.floor(timeLeft / 60);
+                                tokenExpiryText.textContent = `Token Expires in ${minutes}m`;
+                                tokenExpiryBadge.style.borderColor = 'var(--border-color)';
+                                icon.style.color = 'var(--accent-2)';
+                                icon.className = 'bi bi-clock-history';
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    const tokenExpiryText = document.getElementById('tokenExpiryText');
+                    if (tokenExpiryText) {
+                        tokenExpiryText.textContent = 'Error';
+                    }
+                });
+        }
+        
+        function attemptTokenRefresh() {
+            tokenRefreshInProgress = true;
+            
+            const tokenExpiryText = document.getElementById('tokenExpiryText');
+            const originalText = tokenExpiryText.textContent;
+            tokenExpiryText.textContent = 'Refreshing...';
+            
+            fetch('/refresh_token', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (window.ShadowScopeNotifications) {
+                            window.ShadowScopeNotifications.show('Token refreshed successfully', 'success');
+                        }
+                        updateTokenExpiry();
+                    } else {
+                        tokenExpiryText.textContent = originalText;
+                        if (window.ShadowScopeNotifications) {
+                            window.ShadowScopeNotifications.show(data.message || 'Failed to refresh token', 'error');
+                        }
+                    }
+                })
+                .catch(error => {
+                    tokenExpiryText.textContent = originalText;
+                    console.error('Token refresh error:', error);
+                })
+                .finally(() => {
+                    tokenRefreshInProgress = false;
+                });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            updateTokenExpiry();
+            setInterval(updateTokenExpiry, 30000);
+            // API Permissions Toggle
+            const apiPermissionsToggle = document.getElementById('apiPermissionsToggle');
+            const apiPermissionsContent = document.getElementById('apiPermissionsContent');
+            const expandBtn = apiPermissionsToggle?.querySelector('.expand-btn i');
+
+            if (apiPermissionsToggle) {
+            apiPermissionsToggle.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const computedStyle = window.getComputedStyle(apiPermissionsContent);
+                const isCurrentlyVisible = computedStyle.display === 'block';
+
+                if (isCurrentlyVisible) {
+                    apiPermissionsContent.style.display = 'none';
+                    expandBtn.classList.remove('rotated');
+                } else {
+                    apiPermissionsContent.style.display = 'block';
+                    expandBtn.classList.add('rotated');
+                }
+            });
+            }
+
+            // Toggle Cards
+            const toggleCardsBtn = document.getElementById('toggleCardsBtn');
+            const permissionsCard = toggleCardsBtn?.closest('.section-card');
+
+            if (toggleCardsBtn) {
+            toggleCardsBtn.addEventListener('click', function () {
+                    permissionsCard.classList.toggle('collapsed-cards');
+                });
+            }
+
+            // Calculate Attack Metrics
+            function calculateAttackMetrics() {
+                const permissionItems = document.querySelectorAll('.tactic-item i.bi-check-circle-fill');
+                const totalItems = document.querySelectorAll('.tactic-item').length;
+
+                if (totalItems === 0) return 0;
+
+                const percentage = Math.round((permissionItems.length / totalItems) * 100);
+
+                const compromisePercentage = document.getElementById('compromisePercentage');
+                const compromiseMeterBar = document.getElementById('compromiseMeterBar');
+                const attackVectorsCount = document.getElementById('attackVectorsCount');
+                const privilegeLevel = document.getElementById('privilegeLevel');
+                const resourcesCount = document.getElementById('resourcesCount');
+
+                if (compromisePercentage) {
+                    setTimeout(() => {
+                compromisePercentage.textContent = percentage + '%';
+                compromiseMeterBar.style.width = percentage + '%';
+                    }, 100);
+                }
+
+                if (attackVectorsCount) {
+                    attackVectorsCount.textContent = permissionItems.length;
+                }
+
+                if (privilegeLevel) {
+                    privilegeLevel.textContent = percentage + '%';
+                }
+
+                if (resourcesCount) {
+                    const resourceCount = document.querySelectorAll('.nav-link:not(.disabled)').length;
+                    resourcesCount.textContent = resourceCount;
+                }
+
+                return percentage;
+            }
+
+            calculateAttackMetrics();
+
+            // Copy Token
+            const copyTokenBtn = document.getElementById('copyToken');
+            if (copyTokenBtn) {
+                copyTokenBtn.addEventListener('click', async function () {
+            try {
+                const response = await fetch('/get_token', {
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+
+                if (data.token) {
+                    await navigator.clipboard.writeText(data.token);
+                    this.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-clipboard"></i> Copy Token';
+                    }, 2000);
+                } else {
+                    this.innerHTML = '<i class="bi bi-x"></i> Error!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-clipboard"></i> Copy Token';
+                    }, 2000);
+                }
+            } catch (error) {
+                this.innerHTML = '<i class="bi bi-x"></i> Error!';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="bi bi-clipboard"></i> Copy Token';
+                }, 2000);
+            }
+        });
+            }
+
+            // Search Functionality
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchSpinner = document.getElementById('searchSpinner');
+            const suggestionTags = document.querySelectorAll('.suggestion-tag');
+
+            let currentPage = 1;
+            let currentQuery = '';
+            let hasMoreResults = false;
+            let isSearching = false;
+
+            if (searchBtn) {
+            suggestionTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    searchInput.value = tag.dataset.value;
+                        searchBtn.click();
+                });
+            });
+
+            searchBtn.addEventListener('click', async function () {
+                const query = searchInput.value.trim();
+
+                if (!query) {
+                    showStatus('error', 'Please enter a search term');
+                    return;
+                }
+
+                const searchResultsArea = document.getElementById('searchResultsArea');
+                const searchResults = document.getElementById('searchResults');
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+                searchResultsArea.classList.add('visible');
+
+                currentPage = 1;
+                currentQuery = query;
+                searchResults.innerHTML = '';
+
+                await performSearch(query, 1);
+            });
+
+                searchInput.addEventListener('keyup', function (event) {
+                    if (event.key === 'Enter') {
+                        searchBtn.click();
+                    }
+                });
+
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', async function () {
+                if (isSearching || !hasMoreResults) return;
+                currentPage++;
+                await performSearch(currentQuery, currentPage, true);
+            });
+                }
+            }
+
+            async function performSearch(query, page, appendResults = false) {
+                if (isSearching) return;
+
+                isSearching = true;
+
+                if (!appendResults) {
+                    showStatus('loading', 'Searching for sensitive data...');
+                }
+
+                searchBtn.disabled = true;
+                searchSpinner.style.display = 'inline-block';
+
+                try {
+                    const response = await fetch('/search', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            query: query,
+                            page: page,
+                            limit: 15
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    searchBtn.disabled = false;
+                    searchSpinner.style.display = 'none';
+
+                    if (data.success) {
+                        const { results, total, has_more } = data;
+
+                        hasMoreResults = has_more;
+                        document.getElementById('loadMoreBtn').style.display = has_more ? 'block' : 'none';
+
+                        if (results.length === 0 && !appendResults) {
+                            document.getElementById('searchResultsContainer').style.display = 'none';
+                            document.getElementById('searchResultsTable').classList.remove('has-results');
+                            showStatus('empty', 'No sensitive data found matching your query');
+                        } else {
+                            document.getElementById('searchStatus').style.display = 'none';
+                            document.getElementById('searchResultsContainer').style.display = 'block';
+                            document.getElementById('searchResultsTable').classList.add('has-results');
+
+                            renderSearchResults(results, query, appendResults);
+                        }
+                    } else {
+                        document.getElementById('searchResultsContainer').style.display = 'none';
+                        document.getElementById('searchResultsTable').classList.remove('has-results');
+                        showStatus('error', data.message || 'Search failed. Please try again.');
+                        document.getElementById('loadMoreBtn').style.display = 'none';
+                    }
+                } catch (error) {
+                    document.getElementById('searchResultsContainer').style.display = 'none';
+                    document.getElementById('searchResultsTable').classList.remove('has-results');
+                    showStatus('error', 'An error occurred during the threat hunt.');
+                    searchBtn.disabled = false;
+                    searchSpinner.style.display = 'none';
+                    document.getElementById('loadMoreBtn').style.display = 'none';
+                } finally {
+                    isSearching = false;
+                }
+            }
+
+            function renderSearchResults(results, query, append = false) {
+                const searchResults = document.getElementById('searchResults');
+                
+                if (!append) {
+                    searchResults.innerHTML = '';
+                }
+
+                results.forEach(result => {
+                    let iconClass = 'bi-file-earmark';
+                    const fileExt = result.name.split('.').pop().toLowerCase();
+
+                    if (['doc', 'docx'].includes(fileExt)) iconClass = 'bi-file-earmark-word';
+                    if (['xls', 'xlsx'].includes(fileExt)) iconClass = 'bi-file-earmark-excel';
+                    if (['ppt', 'pptx'].includes(fileExt)) iconClass = 'bi-file-earmark-slides';
+                    if (['pdf'].includes(fileExt)) iconClass = 'bi-file-earmark-pdf';
+                    if (['txt'].includes(fileExt)) iconClass = 'bi-file-earmark-text';
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) iconClass = 'bi-file-earmark-image';
+
+                    const row = document.createElement('tr');
+
+                    let snippet = result.snippet || '';
+                    if (snippet) {
+                        const terms = query.split(' ').filter(t => t.length > 2);
+                        terms.forEach(term => {
+                            const regex = new RegExp(escapeRegExp(term), 'gi');
+                            snippet = snippet.replace(regex, match => `<span class="keyword-highlight">${match}</span>`);
+                        });
+                    }
+
+                    row.innerHTML = `
+                <td>
+                    <div class="result-title">
+                        <i class="bi ${iconClass} result-icon"></i>
+                        ${escapeHtml(result.name)}
+                    </div>
+                    <div class="result-content">${snippet}</div>
+                </td>
+                <td>
+                    <span class="result-type">${fileExt.toUpperCase()}</span>
+                </td>
+                <td class="result-source">
+                    <div>SharePoint</div>
+                            <div style="font-size: 0.8125rem; color: var(--gray-dark);">${formatFileSize(result.size)}</div>
+                </td>
+                <td>
+                    <a href="${result.url}" class="result-link" target="_blank">
+                        <i class="bi bi-download"></i> Download
+                    </a>
+                </td>
+            `;
+
+                    searchResults.appendChild(row);
+                });
+            }
+
+            function showStatus(type, message) {
+                const searchStatus = document.getElementById('searchStatus');
+                if (!searchStatus) return;
+                
+                searchStatus.style.display = 'block';
+
+                let icon = 'bi-search';
+                if (type === 'loading') icon = 'bi-arrow-repeat';
+                if (type === 'error') icon = 'bi-exclamation-circle';
+                if (type === 'empty') icon = 'bi-inbox';
+
+                searchStatus.innerHTML = `
+            <i class="bi ${icon} status-icon ${type === 'loading' ? 'spin' : ''}"></i>
+            <div class="status-message">${message}</div>
+        `;
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        });
+    </script>
+
+    <!-- Global Graph Notifications System -->
+    <script src="{{ url_for('static', filename='js/graph-notifications.js') }}"></script>
+    <script>
+        // Initialize Graph Notifications System globally
+        let graphNotifications;
+        document.addEventListener('DOMContentLoaded', function() {
+            graphNotifications = new GraphNotificationsSystem();
+        });
+    </script>
+</body>
+
+</html>
